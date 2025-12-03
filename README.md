@@ -4,4 +4,4 @@ Trabajo en grupo de los miembros:
 Samuel  
 Sergio  
 Jorge  
-Raquel
+Lafran Cesa
