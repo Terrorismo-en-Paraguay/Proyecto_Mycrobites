@@ -1,0 +1,210 @@
+/* Color Variables (Simulated) */
+.root {
+    -fx-primary-color: #8A2BE2;
+    /* Purple */
+    -fx-primary-color-hover: #9932CC;
+    -fx-bg-dark: #2C2F36;
+    /* Dark Grey */
+    -fx-bg-darker: #23252B;
+    /* Darker Grey for Right Pane */
+    -fx-text-white: #FFFFFF;
+    -fx-text-grey: #B0B0B0;
+    -fx-input-bg: #3A3D45;
+
+    -fx-font-family: "Segoe UI", sans-serif;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Left Pane */
+.left-pane {
+    -fx-background-color: #36393F;
+    background-color: #36393F;
+    /* Slightly lighter than right pane based on image */
+}
+
+.title-label {
+    -fx-font-size: 36px;
+    font-size: 36px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: white;
+    color: white;
+}
+
+.subtitle-label {
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-text-fill: #A088D2;
+    color: #A088D2;
+    /* Light purple/pinkish text */
+}
+
+.image-placeholder {
+    -fx-background-color: #F4A460;
+    background-color: #F4A460;
+    /* Placeholder color from image */
+    -fx-background-radius: 10;
+    border-radius: 10px;
+}
+
+/* Right Pane */
+.right-pane {
+    -fx-background-color: #23252B;
+    background-color: #23252B;
+}
+
+.header-label {
+    -fx-font-size: 20px;
+    font-size: 20px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: white;
+    color: white;
+}
+
+/* Toggle Buttons */
+.toggle-container {
+    -fx-background-color: #3A3D45;
+    background-color: #3A3D45;
+    -fx-background-radius: 5;
+    border-radius: 5px;
+    -fx-padding: 2;
+    padding: 2px;
+}
+
+.toggle-button {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-text-fill: #B0B0B0;
+    color: #B0B0B0;
+    -fx-background-radius: 5;
+    border-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.toggle-button.active {
+    -fx-background-color: #A066F5;
+    background-color: #A066F5;
+    /* Lighter purple */
+    -fx-text-fill: white;
+    color: white;
+}
+
+/* Form Fields */
+.field-label {
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+.input-field {
+    -fx-background-color: #3A3D45;
+    background-color: #3A3D45;
+    -fx-text-fill: white;
+    color: white;
+    -fx-prompt-text-fill: #6C6F78;
+    -fx-background-radius: 5;
+    border-radius: 5px;
+    -fx-padding: 10;
+    padding: 10px;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+.input-field:focused {
+    -fx-border-color: #8A2BE2;
+    border-color: #8A2BE2;
+    -fx-border-radius: 5;
+    border-radius: 5px;
+}
+
+/* Buttons */
+.primary-button {
+    -fx-background-color: #8A2BE2;
+    background-color: #8A2BE2;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-background-radius: 5;
+    border-radius: 5px;
+    -fx-padding: 10;
+    padding: 10px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    -fx-background-color: #9932CC;
+    background-color: #9932CC;
+}
+
+.secondary-button {
+    -fx-background-color: #3A3D45;
+    background-color: #3A3D45;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-background-radius: 5;
+    border-radius: 5px;
+    -fx-padding: 10;
+    padding: 10px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #454850;
+    background-color: #454850;
+}
+
+.icon-button {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-text-fill: #A066F5;
+    color: #A066F5;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+/* Links */
+.link-label {
+    -fx-text-fill: #A066F5;
+    color: #A066F5;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-font-size: 12px;
+    font-size: 12px;
+}
+
+.link-label:hover {
+    -fx-underline: true;
+    text-decoration: underline;
+}
+
+.link-label-bold {
+    -fx-text-fill: #A066F5;
+    color: #A066F5;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-font-size: 12px;
+    font-size: 12px;
+}
+
+/* Separator */
+.separator-line {
+    -fx-stroke: #3A3D45;
+    stroke: #3A3D45;
+    border-color: #3A3D45;
+}
