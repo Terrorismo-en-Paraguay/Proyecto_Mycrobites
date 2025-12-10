@@ -26,9 +26,24 @@ public class AppController {
             return;
         }
 
-        // Simulación de autenticación
+        // Simulación de autenticación simplificada
         if ("admin".equals(email) && "1234".equals(password)) {
-            showAlert(Alert.AlertType.INFORMATION, "Éxito", "Inicio de sesión correcto.");
+            try {
+                // Cargar la vista del calendario
+                javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(
+                        getClass().getResource("calendar-view.fxml"));
+                javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load(), 1280, 800); // Tamaño más grande
+                                                                                                 // para el calendario
+
+                // Obtener el stage actual y cambiar la escena
+                javafx.stage.Stage stage = (javafx.stage.Stage) btnLogin.getScene().getWindow();
+                stage.setScene(scene);
+                stage.setMaximized(true); // Asegurar que esté maximizado
+                stage.centerOnScreen();
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error", "No se pudo cargar la pantalla del calendario.");
+            }
         } else {
             showAlert(Alert.AlertType.ERROR, "Error de inicio de sesión", "Correo o contraseña incorrectos.");
         }

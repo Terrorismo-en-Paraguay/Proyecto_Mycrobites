@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane styleClass="root" stylesheets="@calendar.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.calendario_app.CalendarController">
+    <!-- Left Sidebar -->
+    <left>
+        <VBox prefWidth="250.0" spacing="20.0" styleClass="sidebar">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Label fx:id="miniMonthLabel" text="Octubre 2024" textFill="WHITE">
+                        <font>
+                            <Font name="System Bold" size="18.0" />
+                        </font>
+                    </Label>
+                    <Label text="‹  ›" textFill="GREY">
+                        <font>
+                            <Font size="18.0" />
+                        </font>
+                    </Label>
+                </HBox>
+                
+                <!-- Mini Calendar -->
+                <GridPane fx:id="miniCalendarGrid" hgap="5.0" vgap="5.0">
+                   <!-- Days of Week -->
+                   <Label text="LU" textFill="GREY" GridPane.columnIndex="0" />
+                   <Label text="MA" textFill="GREY" GridPane.columnIndex="1" />
+                   <Label text="MI" textFill="GREY" GridPane.columnIndex="2" />
+                   <Label text="JU" textFill="GREY" GridPane.columnIndex="3" />
+                   <Label text="VI" textFill="GREY" GridPane.columnIndex="4" />
+                   <Label text="SA" textFill="GREY" GridPane.columnIndex="5" />
+                   <Label text="DO" textFill="GREY" GridPane.columnIndex="6" />
+                   
+                   <!-- Cells populate dynamically -->
+                </GridPane>
+                   
+
+
+                <Label styleClass="section-header" text="Mis Calendarios" />
+                <VBox spacing="10.0">
+                    <CheckBox selected="true" styleClass="calendar-check-purple" text="Personal" />
+                    <CheckBox selected="true" styleClass="calendar-check-green" text="Trabajo" />
+                    <CheckBox styleClass="calendar-check-grey" text="Familia" />
+                </VBox>
+
+                <Label styleClass="section-header" text="Calendarios Compartidos" />
+                <VBox spacing="10.0">
+                    <CheckBox selected="true" styleClass="calendar-check-orange" text="Equipo de Marketing" />
+                    <CheckBox styleClass="calendar-check-grey" text="Proyecto Phoenix" />
+                </VBox>
+            </children>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <BorderPane styleClass="main-content">
+            <top>
+                <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="header-bar">
+                    <padding>
+                        <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                    </padding>
+                    <children>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label text="Calendario" textFill="WHITE">
+                            <font>
+                                <Font size="22.0" />
+                            </font>
+                        </Label>
+                        
+                        <Button styleClass="btn-transparent-border" text="Hoy" />
+                        
+                        <HBox alignment="CENTER" spacing="10.0">
+                             <Button fx:id="btnPrev" styleClass="icon-btn" text="‹" />
+                             <Button fx:id="btnNext" styleClass="icon-btn" text="›" />
+                        </HBox>
+
+                        <Label fx:id="monthYearLabel" text="Octubre 2024" textFill="WHITE">
+                            <font>
+                                <Font size="20.0" />
+                            </font>
+                        </Label>
+                        
+                        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" spacing="15.0">
+                             <HBox styleClass="view-toggle-group">
+                                 <ToggleButton selected="true" text="Día">
+                                     <toggleGroup>
+                                         <ToggleGroup fx:id="viewGroup"/>
+                                     </toggleGroup>
+                                 </ToggleButton>
+                                 <ToggleButton text="Semana" toggleGroup="$viewGroup"/>
+                                 <ToggleButton text="Mes"  toggleGroup="$viewGroup"/>
+                             </HBox>
+                             
+                             <Button fx:id="btnCreateEvent" styleClass="btn-primary-gradient" text="+ Crear Evento" />
+                             
+                             <StackPane>
+                                 <Circle fill="#f4a460" radius="18.0" />
+                                 <Label text="A" textFill="#3e2723">
+                                     <font>
+                                         <Font name="System Bold" size="16.0" />
+                                     </font>
+                                 </Label>
+                             </StackPane>
+                        </HBox>
+                    </children>
+                </HBox>
+            </top>
+            
+            <center>
+                <GridPane fx:id="calendarGrid" hgap="1.0" vgap="1.0" styleClass="calendar-grid">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28" />
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28" />
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28" />
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28" />
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28" />
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28" />
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="40.0" prefHeight="40.0" /> <!-- Headers -->
+                        <RowConstraints vgrow="ALWAYS" />
+                        <RowConstraints vgrow="ALWAYS" />
+                        <RowConstraints vgrow="ALWAYS" />
+                        <RowConstraints vgrow="ALWAYS" />
+                        <RowConstraints vgrow="ALWAYS" />
+                    </rowConstraints>
+                    
+                    <!-- Weekday Headers -->
+                    <Label text="Lunes" styleClass="day-header" GridPane.columnIndex="0" GridPane.halignment="CENTER"/>
+                    <Label text="Martes" styleClass="day-header" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
+                    <Label text="Miércoles" styleClass="day-header" GridPane.columnIndex="2" GridPane.halignment="CENTER"/>
+                    <Label text="Jueves" styleClass="day-header" GridPane.columnIndex="3" GridPane.halignment="CENTER"/>
+                    <Label text="Viernes" styleClass="day-header" GridPane.columnIndex="4" GridPane.halignment="CENTER"/>
+                    <Label text="Sábado" styleClass="day-header" GridPane.columnIndex="5" GridPane.halignment="CENTER"/>
+                    <Label text="Domingo" styleClass="day-header" GridPane.columnIndex="6" GridPane.halignment="CENTER"/>
+                    
+                    <!-- Grid Lines / Cells will be populated by controller or hardcoded for now -->
+                    <!-- Grid Cells will be populated dynamically -->
+
+
+                </GridPane>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>
