@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Text?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@login.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.calendario_app.HelloController">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@login.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.calendario_app.AppController">
    <children>
       <!-- Left Side -->
       <VBox alignment="CENTER_LEFT" prefHeight="600.0" prefWidth="450.0" styleClass="left-pane" HBox.hgrow="ALWAYS">
@@ -63,7 +63,7 @@
                   <Insets top="20.0" />
                </VBox.margin>
             </Label>
-            <TextField promptText="tu@email.com" styleClass="input-field">
+            <TextField fx:id="txtEmail" promptText="tu@email.com" styleClass="input-field">
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin>
@@ -80,7 +80,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
                <children>
-                  <PasswordField promptText="Introduce tu contraseña" styleClass="input-field" />
+                  <PasswordField fx:id="txtPassword" promptText="Introduce tu contraseña" styleClass="input-field" />
                   <Button mnemonicParsing="false" styleClass="icon-button" text="👁">
                      <StackPane.margin>
                         <Insets right="10.0" />
@@ -99,7 +99,7 @@
             </HBox>
             
             <!-- Login Button -->
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="primary-button" text="Iniciar Sesión">
+            <Button fx:id="btnLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="primary-button" text="Iniciar Sesión" onAction="#onLoginButtonClick">
                <VBox.margin>
                   <Insets top="20.0" />
                </VBox.margin>

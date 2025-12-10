@@ -11,13 +11,13 @@ public class AppController {
     private TextField txtEmail;
 
     @FXML
-    private TextField txtPassword;
+    private PasswordField txtPassword;
 
     @FXML
     private Button btnLogin;
 
     @FXML
-    protected void onLoginButtonClick() {
+    public void onLoginButtonClick() {
         String email = txtEmail.getText();
         String password = txtPassword.getText();
 
