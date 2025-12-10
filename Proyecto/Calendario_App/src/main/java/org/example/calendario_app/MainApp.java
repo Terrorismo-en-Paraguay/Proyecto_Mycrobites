@@ -13,7 +13,6 @@ public class MainApp extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource("login-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
         stage.setMaximized(true);
-        stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
     }
