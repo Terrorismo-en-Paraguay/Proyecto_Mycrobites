@@ -8,8 +8,14 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.example.calendario_app.dao.ClienteDAO;
 import org.example.calendario_app.dao.UsuarioDAO;
+import org.example.calendario_app.dao.impl.ClienteDAOImpl;
 import org.example.calendario_app.dao.impl.UsuarioDAOImpl;
+import org.example.calendario_app.model.Cliente;
+import org.example.calendario_app.model.Usuario;
+
+import java.time.LocalDate;
 
 public class AppController {
     @FXML
@@ -42,11 +48,15 @@ public class AppController {
     @FXML
     private TextField txtSurname;
 
-    private UsuarioDAOImpl udi = new UsuarioDAOImpl();
-
-    private UsuarioDAO usuarioDAO = new UsuarioDAO(udi);
+    private UsuarioDAO usuarioDAO;
+    private ClienteDAO clienteDAO;
 
     private boolean isLoginMode = true;
+
+    public AppController() {
+        this.usuarioDAO = new UsuarioDAO(new UsuarioDAOImpl());
+        this.clienteDAO = new ClienteDAO(new ClienteDAOImpl());
+    }
 
     @FXML
     public void onToggleLogin() {
@@ -103,13 +113,13 @@ public class AppController {
         String email = txtEmail.getText();
         String password = txtPassword.getText();
 
-        if (email.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error de validación", "Por favor, ingrese correo y contraseña.");
-            return;
-        }
-
         if (isLoginMode) {
-            // Lógica de Login con Base de Datos
+            // Lógica de Login
+            if (email.isEmpty() || password.isEmpty()) {
+                showAlert(Alert.AlertType.ERROR, "Error de validación", "Por favor, ingrese correo y contraseña.");
+                return;
+            }
+
             if (usuarioDAO.iniciarSesion(email, password)) {
                 loadCalendar();
             } else {
@@ -120,18 +130,37 @@ public class AppController {
             String name = txtName.getText();
             String surname = txtSurname.getText();
 
-            if (name.isEmpty() || surname.isEmpty()) {
+            if (name.isEmpty() || surname.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Error de validación",
                         "Por favor, complete todos los campos (Nombre, Apellidos, Correo, Contraseña).");
                 return;
             }
 
-            // Simulación Registro - Aquí iría la llamada al servicio de registro
-            showAlert(Alert.AlertType.INFORMATION, "Registro Exitoso",
-                    String.format("Usuario %s %s registrado correctamente.\n(Simulación)", name, surname));
+            try {
+                // 1. Crear Cliente
+                Cliente nuevoCliente = new Cliente(name, surname, LocalDate.now());
+                int idCliente = clienteDAO.registrar(nuevoCliente);
 
-            // Volver a login
-            onToggleLogin();
+                if (idCliente != -1) {
+                    // 2. Crear Usuario vinculado al Cliente
+                    Usuario nuevoUsuario = new Usuario(idCliente, email, password, "USER");
+                    boolean registroExitoso = usuarioDAO.registrar(nuevoUsuario);
+
+                    if (registroExitoso) {
+                        showAlert(Alert.AlertType.INFORMATION, "Registro Exitoso",
+                                "Usuario registrado correctamente. Ahora puede iniciar sesión.");
+                        onToggleLogin();
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Error de Registro", "No se pudo crear el usuario.");
+                    }
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error de Registro", "No se pudo crear el cliente.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error de Sistema",
+                        "Ocurrió un error durante el registro: " + e.getMessage());
+            }
         }
     }
 

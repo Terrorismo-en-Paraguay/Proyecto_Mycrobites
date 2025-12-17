@@ -17,10 +17,14 @@ public class UsuarioDAO {
         boolean login = false;
         List<String> datos_login = usuarioDAO.iniciarSesion(email);
         if (!datos_login.isEmpty()) {
-            login = email.equals(datos_login.get(0))&&password.equals(datos_login.get(1));
-        }else {
+            login = email.equals(datos_login.get(0)) && password.equals(datos_login.get(1));
+        } else {
             System.out.println("Usuario no encontrado");
         }
         return login;
+    }
+
+    public boolean registrar(Usuario usuario) {
+        return usuarioDAO.registrar(usuario);
     }
 }
