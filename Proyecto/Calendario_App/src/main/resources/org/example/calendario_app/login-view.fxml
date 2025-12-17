@@ -44,7 +44,7 @@
             <Insets bottom="40.0" left="60.0" right="60.0" top="40.0" />
          </padding>
          <children>
-            <Label styleClass="header-label" text="Accede a tu cuenta" />
+            <Label fx:id="lblHeader" styleClass="header-label" text="Accede a tu cuenta" />
             
             <!-- Toggle Buttons -->
             <HBox alignment="CENTER" styleClass="toggle-container">
@@ -52,11 +52,37 @@
                   <Insets top="20.0" />
                </VBox.margin>
                <children>
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="toggle-button, active" text="Iniciar Sesión" HBox.hgrow="ALWAYS" />
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="toggle-button" text="Registro" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnToggleLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onToggleLogin" styleClass="toggle-button, active" text="Iniciar Sesión" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnToggleRegister" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onToggleRegister" styleClass="toggle-button" text="Registro" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
             
+            <!-- Register Fields (Name & Surname) -->
+            <VBox fx:id="registerFieldsContainer" managed="false" visible="false">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+               <children>
+                  <Label styleClass="field-label" text="Nombre" />
+                  <TextField fx:id="txtName" promptText="Tu nombre" styleClass="input-field">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+                  
+                  <Label styleClass="field-label" text="Apellidos">
+                     <VBox.margin>
+                        <Insets top="15.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="txtSurname" promptText="Tus apellidos" styleClass="input-field">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+               </children>
+            </VBox>
+
             <!-- Email Field -->
             <Label styleClass="field-label" text="Correo Electrónico">
                <VBox.margin>
@@ -89,7 +115,7 @@
                </children>
             </StackPane>
             
-            <HBox alignment="CENTER_RIGHT">
+            <HBox fx:id="boxForgotPassword" alignment="CENTER_RIGHT">
                <children>
                   <Label styleClass="link-label" text="¿Olvidé mi contraseña?" />
                </children>
