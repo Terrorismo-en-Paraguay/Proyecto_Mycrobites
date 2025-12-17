@@ -8,6 +8,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.example.calendario_app.dao.UsuarioDAO;
+import org.example.calendario_app.dao.impl.UsuarioDAOImpl;
 
 public class AppController {
     @FXML
@@ -39,6 +41,8 @@ public class AppController {
 
     @FXML
     private TextField txtSurname;
+
+    private UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
 
     private boolean isLoginMode = true;
 
@@ -103,8 +107,8 @@ public class AppController {
         }
 
         if (isLoginMode) {
-            // Lógica de Login existente
-            if ("admin".equals(email) && "1234".equals(password)) {
+            // Lógica de Login con Base de Datos
+            if (usuarioDAO.iniciarSesion(email, password)) {
                 loadCalendar();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error de inicio de sesión", "Correo o contraseña incorrectos.");

@@ -1,5 +1,5 @@
 package org.example.calendario_app.dao;
 
 public interface UsuarioDAO {
-    void iniciarSesion();
+    boolean iniciarSesion(String email, String password);
 }
