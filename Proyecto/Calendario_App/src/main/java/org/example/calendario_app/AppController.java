@@ -42,7 +42,9 @@ public class AppController {
     @FXML
     private TextField txtSurname;
 
-    private UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
+    private UsuarioDAOImpl udi = new UsuarioDAOImpl();
+
+    private UsuarioDAO usuarioDAO = new UsuarioDAO(udi);
 
     private boolean isLoginMode = true;
 
