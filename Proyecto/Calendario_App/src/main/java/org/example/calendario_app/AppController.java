@@ -14,6 +14,7 @@ import org.example.calendario_app.dao.impl.ClienteDAOImpl;
 import org.example.calendario_app.dao.impl.UsuarioDAOImpl;
 import org.example.calendario_app.model.Cliente;
 import org.example.calendario_app.model.Usuario;
+import org.example.calendario_app.util.Session;
 
 import java.time.LocalDate;
 
@@ -120,7 +121,15 @@ public class AppController {
                 return;
             }
 
-            if (usuarioDAO.iniciarSesion(email, password)) {
+            Usuario usuario = usuarioDAO.iniciarSesion(email, password);
+            if (usuario != null) {
+                // Fetch associated Client
+                Cliente cliente = clienteDAO.obtenerPorId(usuario.getId_cliente());
+
+                // Store in Session
+                Session.getInstance().setUsuario(usuario);
+                Session.getInstance().setCliente(cliente);
+
                 loadCalendar();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error de inicio de sesión", "Correo o contraseña incorrectos.");

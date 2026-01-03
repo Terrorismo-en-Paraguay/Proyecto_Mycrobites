@@ -181,7 +181,15 @@
 }
 
 /* Checkboxes */
+/* Checkboxes */
+/* Purple */
 .calendar-check-purple .box {
+    -fx-background-color: #000000;
+    -fx-border-color: #555;
+    -fx-border-radius: 3;
+}
+
+.calendar-check-purple:selected .box {
     -fx-background-color: #A066F5;
     -fx-border-color: transparent;
 }
@@ -190,7 +198,22 @@
     -fx-background-color: white;
 }
 
+.calendar-check-purple {
+    -fx-text-fill: #B0B0B0;
+}
+
+.calendar-check-purple:selected {
+    -fx-text-fill: #A066F5;
+}
+
+/* Green */
 .calendar-check-green .box {
+    -fx-background-color: #000000;
+    -fx-border-color: #555;
+    -fx-border-radius: 3;
+}
+
+.calendar-check-green:selected .box {
     -fx-background-color: #2ECC71;
     -fx-border-color: transparent;
 }
@@ -199,7 +222,22 @@
     -fx-background-color: white;
 }
 
+.calendar-check-green {
+    -fx-text-fill: #B0B0B0;
+}
+
+.calendar-check-green:selected {
+    -fx-text-fill: #2ECC71;
+}
+
+/* Orange */
 .calendar-check-orange .box {
+    -fx-background-color: #000000;
+    -fx-border-color: #555;
+    -fx-border-radius: 3;
+}
+
+.calendar-check-orange:selected .box {
     -fx-background-color: #E67E22;
     -fx-border-color: transparent;
 }
@@ -208,7 +246,22 @@
     -fx-background-color: white;
 }
 
+.calendar-check-orange {
+    -fx-text-fill: #B0B0B0;
+}
+
+.calendar-check-orange:selected {
+    -fx-text-fill: #E67E22;
+}
+
+/* Grey */
 .calendar-check-grey .box {
+    -fx-background-color: #000000;
+    -fx-border-color: #555;
+    -fx-border-radius: 3;
+}
+
+.calendar-check-grey:selected .box {
     -fx-background-color: #555;
     -fx-border-color: transparent;
 }

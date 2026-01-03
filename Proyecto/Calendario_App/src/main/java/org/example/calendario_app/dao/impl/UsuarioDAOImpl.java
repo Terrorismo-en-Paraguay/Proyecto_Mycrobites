@@ -5,8 +5,6 @@ import org.example.calendario_app.model.Usuario;
 import org.example.calendario_app.util.DatabaseConnection;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class UsuarioDAOImpl {
     DatabaseConnection databaseConnection;
@@ -15,20 +13,24 @@ public class UsuarioDAOImpl {
         databaseConnection = new DatabaseConnection();
     }
 
-    public List<String> iniciarSesion(String email) {
-        List<String> Login = new ArrayList<String>();
+    public Usuario iniciarSesion(String email) {
+        Usuario usuario = null;
         String query = "SELECT * FROM usuarios WHERE correo = '" + email + "'";
         try (Connection conn = databaseConnection.getConn();
                 Statement stmt = databaseConnection.getConn().createStatement();
                 ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) {
-                Login.add(rs.getString("correo"));
-                Login.add(rs.getString("password_hash"));
+            if (rs.next()) {
+                usuario = new Usuario(
+                        rs.getInt("id_cliente"),
+                        rs.getString("correo"),
+                        rs.getString("password_hash"),
+                        "USER"
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return Login;
+        return usuario;
     }
 
     public boolean registrar(Usuario usuario) {

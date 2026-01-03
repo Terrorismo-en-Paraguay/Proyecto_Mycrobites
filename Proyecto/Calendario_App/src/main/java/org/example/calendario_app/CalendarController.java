@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import org.example.calendario_app.util.Session;
 
 public class CalendarController {
 
@@ -37,6 +38,9 @@ public class CalendarController {
     private Label miniMonthLabel;
 
     @FXML
+    private Label userInitialLabel;
+
+    @FXML
     private GridPane miniCalendarGrid;
 
     @FXML
@@ -48,6 +52,16 @@ public class CalendarController {
     @FXML
     public void initialize() {
         currentYearMonth = YearMonth.now();
+
+        // Set user initial
+        if (Session.getInstance().getCliente() != null) {
+            String name = Session.getInstance().getCliente().getNombre();
+            if (name != null && !name.isEmpty()) {
+                String initial = name.substring(0, 1).toUpperCase();
+                userInitialLabel.setText(initial);
+            }
+        }
+
         drawCalendar();
         drawMiniCalendar();
 
