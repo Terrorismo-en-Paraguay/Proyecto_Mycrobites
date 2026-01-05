@@ -112,14 +112,14 @@
                              
                              <Button fx:id="btnCreateEvent" styleClass="btn-primary-gradient" text="+ Crear Evento" />
                              
-                             <StackPane>
-                                 <Circle fill="#f4a460" radius="18.0" />
-                                 <Label fx:id="userInitialLabel" text="A" textFill="#3e2723">
-                                     <font>
-                                         <Font name="System Bold" size="16.0" />
-                                     </font>
-                                 </Label>
-                             </StackPane>
+                            <StackPane fx:id="userIconContainer">
+                                <Circle fill="#f4a460" radius="18.0" />
+                                <Label fx:id="userInitialLabel" text="A" textFill="#3e2723">
+                                    <font>
+                                        <Font name="System Bold" size="16.0" />
+                                    </font>
+                                </Label>
+                            </StackPane>
                         </HBox>
                     </children>
                 </HBox>

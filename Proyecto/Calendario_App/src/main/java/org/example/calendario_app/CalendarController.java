@@ -5,10 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.Cursor;
+import javafx.geometry.Side;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -41,6 +46,9 @@ public class CalendarController {
     private Label userInitialLabel;
 
     @FXML
+    private StackPane userIconContainer;
+
+    @FXML
     private GridPane miniCalendarGrid;
 
     @FXML
@@ -59,6 +67,9 @@ public class CalendarController {
             if (name != null && !name.isEmpty()) {
                 String initial = name.substring(0, 1).toUpperCase();
                 userInitialLabel.setText(initial);
+
+                // Configurar menú de usuario
+                setupUserMenu(name);
             }
         }
 
@@ -247,6 +258,43 @@ public class CalendarController {
                 miniCalendarGrid.add(dayLabel, col, row);
                 dateIterator = dateIterator.plusDays(1);
             }
+        }
+    }
+
+    private void setupUserMenu(String userName) {
+        userIconContainer.setCursor(Cursor.HAND);
+
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem userItem = new MenuItem("Usuario: " + userName);
+        userItem.setDisable(true);
+        userItem.setStyle("-fx-opacity: 1.0; -fx-font-weight: bold; -fx-text-fill: black;");
+
+        MenuItem logoutItem = new MenuItem("Cerrar sesión");
+        logoutItem.setOnAction(e -> logout());
+
+        contextMenu.getItems().addAll(userItem, logoutItem);
+
+        userIconContainer.setOnMouseClicked(e -> {
+            contextMenu.show(userIconContainer, Side.BOTTOM, 0, 0);
+        });
+    }
+
+    private void logout() {
+        // Limpiar sesión
+        Session.getInstance().setUsuario(null);
+        Session.getInstance().setCliente(null);
+
+        // Volver a login
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("login-view.fxml"));
+            Scene scene = new Scene(loader.load(), 1280, 800);
+            Stage stage = (Stage) userIconContainer.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setMaximized(true);
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
