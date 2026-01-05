@@ -17,6 +17,9 @@ import org.example.calendario_app.model.Usuario;
 import org.example.calendario_app.util.Session;
 
 import java.time.LocalDate;
+import javafx.stage.Screen;
+import javafx.geometry.Rectangle2D;
+import javafx.collections.ObservableList;
 
 public class AppController {
     @FXML
@@ -181,8 +184,19 @@ public class AppController {
 
             javafx.stage.Stage stage = (javafx.stage.Stage) btnLogin.getScene().getWindow();
             stage.setScene(scene);
+
+            // Get current screen
+            ObservableList<Screen> screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(),
+                    stage.getWidth(), stage.getHeight());
+            if (!screens.isEmpty()) {
+                Screen screen = screens.get(0);
+                Rectangle2D bounds = screen.getVisualBounds();
+                stage.setX(bounds.getMinX());
+                stage.setY(bounds.getMinY());
+                stage.setWidth(bounds.getWidth());
+                stage.setHeight(bounds.getHeight());
+            }
             stage.setMaximized(true);
-            stage.centerOnScreen();
         } catch (java.io.IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "No se pudo cargar la pantalla del calendario.");
