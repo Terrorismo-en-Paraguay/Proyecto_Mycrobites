@@ -265,12 +265,14 @@ public class CalendarController {
         userIconContainer.setCursor(Cursor.HAND);
 
         ContextMenu contextMenu = new ContextMenu();
+        contextMenu.setStyle("-fx-background-color: -fx-bg-darker;");
 
         MenuItem userItem = new MenuItem("Usuario: " + userName);
         userItem.setDisable(true);
-        userItem.setStyle("-fx-opacity: 1.0; -fx-font-weight: bold; -fx-text-fill: black;");
+        userItem.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
 
         MenuItem logoutItem = new MenuItem("Cerrar sesión");
+        logoutItem.setStyle("-fx-text-fill: white;");
         logoutItem.setOnAction(e -> logout());
 
         contextMenu.getItems().addAll(userItem, logoutItem);
