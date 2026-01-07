@@ -31,6 +31,9 @@ import org.example.calendario_app.dao.EventoDAO;
 import org.example.calendario_app.dao.EtiquetaDAO;
 import org.example.calendario_app.dao.impl.EventoDAOImpl;
 import org.example.calendario_app.dao.impl.EtiquetaDAOImpl;
+import org.example.calendario_app.dao.FestivoDAO;
+import org.example.calendario_app.dao.impl.FestivoDAOImpl;
+import org.example.calendario_app.model.Festivo;
 
 public class CalendarController {
 
@@ -72,14 +75,18 @@ public class CalendarController {
     private final List<Etiqueta> labels = new ArrayList<>();
     private EventoDAO eventoDAO;
     private EtiquetaDAO etiquetaDAO;
+    private FestivoDAO festivoDAO;
+    private final List<Festivo> holidays = new ArrayList<>();
 
     @FXML
     public void initialize() {
         eventoDAO = new EventoDAOImpl();
         etiquetaDAO = new EtiquetaDAOImpl();
+        festivoDAO = new FestivoDAOImpl();
 
         loadEvents();
         loadLabels();
+        loadHolidays();
 
         currentYearMonth = YearMonth.now();
 
@@ -195,6 +202,11 @@ public class CalendarController {
         }
     }
 
+    private void loadHolidays() {
+        holidays.clear();
+        holidays.addAll(festivoDAO.findAll());
+    }
+
     private void openCreateEventDialog() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("event-dialog.fxml"));
@@ -274,6 +286,14 @@ public class CalendarController {
                 Label dayLabel = new Label(String.valueOf(dateIterator.getDayOfMonth()));
                 dayLabel.getStyleClass().add("day-label");
                 cell.getChildren().add(dayLabel);
+
+                // Add Holidays
+                for (Festivo festivo : holidays) {
+                    if (festivo.getDia() == dateIterator.getDayOfMonth()
+                            && festivo.getMes() == dateIterator.getMonthValue()) {
+                        addHolidayLabel(cell, festivo);
+                    }
+                }
 
                 // Add User Created Events
 
@@ -376,6 +396,13 @@ public class CalendarController {
         eventLabel.setStyle("-fx-cursor: hand;");
 
         cell.getChildren().add(eventLabel);
+    }
+
+    private void addHolidayLabel(VBox cell, Festivo festivo) {
+        Label paramLabel = new Label("★ " + festivo.getNombre());
+        paramLabel.getStyleClass().add("event-label-holiday");
+        paramLabel.setWrapText(true);
+        cell.getChildren().add(paramLabel);
     }
 
     private void drawMiniCalendar() {
