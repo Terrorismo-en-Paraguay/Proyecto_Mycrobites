@@ -39,6 +39,15 @@
         </Label>
     </VBox>
 
+    <VBox spacing="5.0">
+        <Label styleClass="input-label" text="Horario" />
+        <Label fx:id="timeLabel" text="HH:mm - HH:mm" textFill="WHITE">
+             <font>
+                <Font size="14.0" />
+            </font>
+        </Label>
+    </VBox>
+
     <VBox spacing="5.0" VBox.vgrow="ALWAYS">
         <Label styleClass="input-label" text="Descripción" />
         <Label fx:id="descriptionLabel" text="Descripción del evento..." textFill="#e0e0e0" wrapText="true" VBox.vgrow="ALWAYS">

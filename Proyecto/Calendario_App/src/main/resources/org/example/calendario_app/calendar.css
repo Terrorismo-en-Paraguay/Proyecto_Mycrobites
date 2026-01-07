@@ -254,20 +254,28 @@
     -fx-text-fill: #E67E22;
 }
 
-/* Grey */
-.calendar-check-grey .box {
+/* Red */
+.calendar-check-red .box {
     -fx-background-color: #000000;
     -fx-border-color: #555;
     -fx-border-radius: 3;
 }
 
-.calendar-check-grey:selected .box {
-    -fx-background-color: #555;
+.calendar-check-red:selected .box {
+    -fx-background-color: #E74C3C;
     -fx-border-color: transparent;
 }
 
-.calendar-check-grey:selected .mark {
+.calendar-check-red:selected .mark {
     -fx-background-color: white;
+}
+
+.calendar-check-red {
+    -fx-text-fill: #B0B0B0;
+}
+
+.calendar-check-red:selected {
+    -fx-text-fill: #E74C3C;
 }
 
 .sidebar {

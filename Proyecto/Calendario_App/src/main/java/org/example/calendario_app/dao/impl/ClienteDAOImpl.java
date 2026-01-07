@@ -47,8 +47,7 @@ public class ClienteDAOImpl {
                 cliente = new Cliente(
                         rs.getString("nombre"),
                         rs.getString("apellidos"),
-                        null // Fecha registro not strictly needed for UI now, or
-                             // java.sql.Date.valueOf(rs.getDate("fecha_registro").toLocalDate()) if needed
+                        null
                 );
             }
         } catch (SQLException e) {

@@ -11,6 +11,7 @@ public class Cliente {
     private String apellidos;
     private LocalDate fecha_creacion;
     private LocalDate fecha_modificacion;
+
     public Cliente(String nombre, String apellidos, LocalDate fecha_creacion) {
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -24,6 +25,10 @@ public class Cliente {
         this.apellidos = apellidos;
         this.fecha_creacion = fecha_creacion;
         this.fecha_modificacion = fecha_modificacion;
+    }
+
+    public int getId() {
+        return id_cliente;
     }
 
     @Override

@@ -54,17 +54,23 @@
                    
 
 
+                <Button fx:id="btnCreateLabel" text="+ Crear Etiqueta" styleClass="btn-transparent-border" maxWidth="Infinity" alignment="CENTER_LEFT">
+                     <VBox.margin>
+                         <Insets top="10.0" bottom="10.0"/>
+                     </VBox.margin>
+                </Button>
+
                 <Label styleClass="section-header" text="Mis Calendarios" />
-                <VBox spacing="10.0">
+                <VBox fx:id="myCalendarsContainer" spacing="10.0">
                     <CheckBox selected="true" styleClass="calendar-check-purple" text="Personal" />
                     <CheckBox selected="true" styleClass="calendar-check-green" text="Trabajo" />
-                    <CheckBox styleClass="calendar-check-grey" text="Familia" />
+                    <CheckBox styleClass="calendar-check-red" text="Familia" />
                 </VBox>
 
                 <Label styleClass="section-header" text="Calendarios Compartidos" />
                 <VBox spacing="10.0">
                     <CheckBox selected="true" styleClass="calendar-check-orange" text="Equipo de Marketing" />
-                    <CheckBox styleClass="calendar-check-grey" text="Proyecto Phoenix" />
+                    <CheckBox styleClass="calendar-check-red" text="Proyecto Phoenix" />
                 </VBox>
             </children>
         </VBox>

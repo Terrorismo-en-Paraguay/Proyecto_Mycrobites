@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -24,6 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.example.calendario_app.util.Session;
+import org.example.calendario_app.model.Evento;
+import org.example.calendario_app.model.Etiqueta;
+import org.example.calendario_app.dao.EventoDAO;
+import org.example.calendario_app.dao.EtiquetaDAO;
+import org.example.calendario_app.dao.impl.EventoDAOImpl;
+import org.example.calendario_app.dao.impl.EtiquetaDAOImpl;
 
 public class CalendarController {
 
@@ -54,22 +61,45 @@ public class CalendarController {
     @FXML
     private Button btnCreateEvent;
 
+    @FXML
+    private Button btnCreateLabel;
+
+    @FXML
+    private VBox myCalendarsContainer;
+
     private YearMonth currentYearMonth;
-    private final List<Event> events = new ArrayList<>();
+    private final List<Evento> events = new ArrayList<>();
+    private final List<Etiqueta> labels = new ArrayList<>();
+    private EventoDAO eventoDAO;
+    private EtiquetaDAO etiquetaDAO;
 
     @FXML
     public void initialize() {
+        eventoDAO = new EventoDAOImpl();
+        etiquetaDAO = new EtiquetaDAOImpl();
+
+        loadEvents();
+        loadLabels();
+
         currentYearMonth = YearMonth.now();
 
         // Set user initial
-        if (Session.getInstance().getCliente() != null) {
-            String name = Session.getInstance().getCliente().getNombre();
-            if (name != null && !name.isEmpty()) {
-                String initial = name.substring(0, 1).toUpperCase();
-                userInitialLabel.setText(initial);
-
-                // Configurar menú de usuario
-                setupUserMenu(name);
+        if (Session.getInstance().getUsuario() != null) {
+            String name = Session.getInstance().getUsuario().getCorreo(); // Using email or fetch name from Cliente
+                                                                          // logic if preferred, but schema splits them.
+                                                                          // Stick to simple user init.
+            // Actually, Usuario has id_cliente, I can fetch Cliente if needed, but for now
+            // let's use what we have or just skip name if not available in Usuario.
+            // Wait, the prompt implies "change code according to tables".
+            // Usuario has correo. Cliente has name.
+            // Session has both set usually?
+            // Let's assume Session.getCliente() is still populated on login!
+            if (Session.getInstance().getCliente() != null) {
+                String initName = Session.getInstance().getCliente().getNombre();
+                if (initName != null && !initName.isEmpty()) {
+                    userInitialLabel.setText(initName.substring(0, 1).toUpperCase());
+                    setupUserMenu(initName);
+                }
             }
         }
 
@@ -89,6 +119,80 @@ public class CalendarController {
         });
 
         btnCreateEvent.setOnAction(e -> openCreateEventDialog());
+        btnCreateLabel.setOnAction(e -> openCreateLabelDialog());
+    }
+
+    private void openCreateLabelDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("label-dialog.fxml"));
+            VBox page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Crear Etiqueta");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(btnCreateLabel.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            LabelDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                String name = controller.getLabelName();
+                String colorClass = controller.getLabelColorClass();
+                if (Session.getInstance().getUsuario() != null) {
+                    // Store the short code (e.g. "purple") in DB
+                    Etiqueta newEtiqueta = new Etiqueta(name, colorClass);
+                    int userId = Session.getInstance().getUsuario().getId();
+                    if (etiquetaDAO.save(newEtiqueta, userId) > 0) {
+                        labels.add(newEtiqueta); // Add to local list so it appears in Event Dialog
+                        addCalendarLabelUI(newEtiqueta);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addCalendarLabelUI(Etiqueta etiqueta) {
+        CheckBox newCalendar = new CheckBox(etiqueta.getNombre());
+        newCalendar.setSelected(true);
+        // Handle both short codes ("purple") and legacy full classes
+        // ("calendar-check-purple")
+        String color = etiqueta.getColor();
+        if (color != null && !color.startsWith("calendar-check-")) {
+            color = "calendar-check-" + color;
+        }
+        newCalendar.getStyleClass().add(color);
+
+        // Store Label ID in user data for filtering
+        newCalendar.setUserData(etiqueta.getId());
+
+        // Redraw calendar when checkbox toggled
+        newCalendar.setOnAction(e -> drawCalendar());
+
+        myCalendarsContainer.getChildren().add(newCalendar);
+    }
+
+    private void loadEvents() {
+        if (Session.getInstance().getUsuario() != null) {
+            events.clear();
+            events.addAll(eventoDAO.findAllByUsuarioId(Session.getInstance().getUsuario().getId()));
+        }
+    }
+
+    private void loadLabels() {
+        myCalendarsContainer.getChildren().clear();
+        labels.clear();
+        if (Session.getInstance().getUsuario() != null) {
+            labels.addAll(etiquetaDAO.findAllByUsuarioId(Session.getInstance().getUsuario().getId()));
+            for (Etiqueta etiqueta : labels) {
+                addCalendarLabelUI(etiqueta);
+            }
+        }
     }
 
     private void openCreateEventDialog() {
@@ -105,12 +209,21 @@ public class CalendarController {
 
             EventDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
+            controller.setLabels(labels);
 
             dialogStage.showAndWait();
 
             if (controller.isSaveClicked()) {
-                events.add(controller.getEvent());
-                drawCalendar(); // Refresh to show new event
+                Evento newEvento = controller.getEvento();
+                if (Session.getInstance().getUsuario() != null) {
+                    System.out.println(
+                            "DEBUG: Current User ID in Session = " + Session.getInstance().getUsuario().getId());
+                    newEvento.setId_creador(Session.getInstance().getUsuario().getId());
+                    if (eventoDAO.save(newEvento) > 0) {
+                        events.add(newEvento);
+                        drawCalendar(); // Refresh to show new event
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -163,8 +276,30 @@ public class CalendarController {
                 cell.getChildren().add(dayLabel);
 
                 // Add User Created Events
-                for (Event event : events) {
-                    if (event.getDate().equals(dateIterator)) {
+
+                // 1. Collect visible label IDs
+                List<Integer> visibleLabelIds = new ArrayList<>();
+                for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
+                    if (node instanceof CheckBox) {
+                        CheckBox cb = (CheckBox) node;
+                        if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                            visibleLabelIds.add((Integer) cb.getUserData());
+                        }
+                    }
+                }
+
+                for (Evento event : events) {
+                    // Check if event should be visible
+                    // If event has no label, show it (default behavior, or maybe hide?)
+                    // If event has label, check if label ID is in visible list
+                    boolean isVisible = true;
+                    if (event.getId_etiqueta() != null) {
+                        if (!visibleLabelIds.contains(event.getId_etiqueta())) {
+                            isVisible = false;
+                        }
+                    }
+
+                    if (isVisible && event.getFecha().equals(dateIterator)) {
                         addEventLabel(cell, event);
                     }
                 }
@@ -181,7 +316,7 @@ public class CalendarController {
         }
     }
 
-    private void openEventDetailsDialog(Event event) {
+    private void openEventDetailsDialog(Evento event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("event-details-view.fxml"));
             VBox page = loader.load();
@@ -195,7 +330,7 @@ public class CalendarController {
 
             EventDetailsController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setEvent(event);
+            controller.setEvento(event);
 
             dialogStage.showAndWait();
         } catch (IOException e) {
@@ -203,11 +338,31 @@ public class CalendarController {
         }
     }
 
-    private void addEventLabel(VBox cell, Event event) {
-        Label eventLabel = new Label("• " + event.getTitle());
-        // Simple random color for variety or specific based on type
-        // defaulting to purple for user events for now
-        eventLabel.getStyleClass().add("event-label-purple");
+    private void addEventLabel(VBox cell, Evento event) {
+        // Format time "HH:mm"
+        String timeStr = event.getFecha_inicio().format(DateTimeFormatter.ofPattern("HH:mm"));
+        Label eventLabel = new Label(timeStr + " " + event.getTitulo());
+
+        // Default style
+        String styleClass = "event-label-purple";
+
+        // Find label color if exists
+        if (event.getId_etiqueta() != null) {
+            for (Etiqueta label : labels) {
+                if (label.getId() == event.getId_etiqueta()) {
+                    // Label color could be short code e.g. "red" or legacy "calendar-check-red"
+                    // Map to event-label-COLOR e.g. event-label-red
+                    String labelColor = label.getColor();
+                    if (labelColor != null && !labelColor.isEmpty()) {
+                        String shortColor = labelColor.replace("calendar-check-", "");
+                        styleClass = "event-label-" + shortColor;
+                    }
+                    break;
+                }
+            }
+        }
+
+        eventLabel.getStyleClass().add(styleClass);
         eventLabel.setWrapText(true);
 
         // Add click listener

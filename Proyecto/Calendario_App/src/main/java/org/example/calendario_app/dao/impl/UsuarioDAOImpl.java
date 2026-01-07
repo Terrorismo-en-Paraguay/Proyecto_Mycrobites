@@ -21,11 +21,11 @@ public class UsuarioDAOImpl {
                 ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
                 usuario = new Usuario(
+                        rs.getInt("id_usuario"), // Added id_usuario
                         rs.getInt("id_cliente"),
                         rs.getString("correo"),
                         rs.getString("password_hash"),
-                        "USER"
-                );
+                        "USER");
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -31,7 +31,29 @@
             <Label styleClass="input-label" text="Fecha" />
             <DatePicker fx:id="datePicker" promptText="mm/dd/yyyy" styleClass="dialog-input" />
         </VBox>
-        <!-- Optional Time Field Placeholder if needed later -->
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label styleClass="input-label" text="Etiqueta" />
+             <javafx.scene.control.ComboBox fx:id="labelComboBox" promptText="Seleccionar etiqueta" styleClass="dialog-input" maxWidth="Infinity"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="15.0">
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label styleClass="input-label" text="Hora Inicio" />
+            <HBox spacing="5.0" alignment="CENTER_LEFT">
+                 <javafx.scene.control.ComboBox fx:id="startHourCombo" promptText="HH" styleClass="dialog-input" prefWidth="80"/>
+                 <Label text=":" textFill="WHITE"/>
+                 <javafx.scene.control.ComboBox fx:id="startMinuteCombo" promptText="MM" styleClass="dialog-input" prefWidth="80"/>
+            </HBox>
+        </VBox>
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label styleClass="input-label" text="Hora Fin" />
+            <HBox spacing="5.0" alignment="CENTER_LEFT">
+                 <javafx.scene.control.ComboBox fx:id="endHourCombo" promptText="HH" styleClass="dialog-input" prefWidth="80"/>
+                 <Label text=":" textFill="WHITE"/>
+                 <javafx.scene.control.ComboBox fx:id="endMinuteCombo" promptText="MM" styleClass="dialog-input" prefWidth="80"/>
+            </HBox>
+        </VBox>
     </HBox>
 
     <VBox spacing="5.0" alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">

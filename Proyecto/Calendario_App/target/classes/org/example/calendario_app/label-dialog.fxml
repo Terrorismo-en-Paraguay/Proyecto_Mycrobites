@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="15.0" styleClass="dialog-root" stylesheets="@calendar.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.calendario_app.LabelDialogController">
+    <padding>
+        <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+    </padding>
+
+    <Label text="Crear Etiqueta" textFill="WHITE">
+        <font>
+            <Font name="System Bold" size="20.0" />
+        </font>
+    </Label>
+
+    <VBox spacing="5.0" alignment="CENTER_LEFT">
+        <Label styleClass="input-label" text="Nombre de la Etiqueta" />
+        <TextField fx:id="nameField" promptText="Ej: Gimnasio" styleClass="dialog-input" />
+    </VBox>
+
+    <VBox spacing="5.0" alignment="CENTER_LEFT">
+        <Label styleClass="input-label" text="Color" />
+        <ComboBox fx:id="colorComboBox" promptText="Seleccionar color" styleClass="dialog-input" maxWidth="Infinity" />
+    </VBox>
+
+    <HBox alignment="CENTER_RIGHT" spacing="10.0" style="-fx-padding: 10 0 0 0;">
+        <Button fx:id="cancelButton" cancelButton="true" text="Cancelar" styleClass="btn-transparent-border" />
+        <Button fx:id="saveButton" defaultButton="true" text="Crear" styleClass="btn-primary-gradient" />
+    </HBox>
+
+</VBox>

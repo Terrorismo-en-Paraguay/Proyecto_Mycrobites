@@ -153,10 +153,10 @@ public class AppController {
 
             Usuario usuario = usuarioDAO.iniciarSesion(email, password);
             if (usuario != null) {
-                // Fetch associated Client
+                // Obtener cliente asociado
                 Cliente cliente = clienteDAO.obtenerPorId(usuario.getId_cliente());
 
-                // Store in Session
+                // Obtener sesion actual
                 Session.getInstance().setUsuario(usuario);
                 Session.getInstance().setCliente(cliente);
 
@@ -212,7 +212,7 @@ public class AppController {
             javafx.stage.Stage stage = (javafx.stage.Stage) btnLogin.getScene().getWindow();
             stage.setScene(scene);
 
-            // Get current screen
+            // Obtener pantalla actual
             ObservableList<Screen> screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(),
                     stage.getWidth(), stage.getHeight());
             if (!screens.isEmpty()) {
