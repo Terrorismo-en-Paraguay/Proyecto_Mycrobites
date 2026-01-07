@@ -29,6 +29,12 @@ public class AppController {
     private PasswordField txtPassword;
 
     @FXML
+    private TextField txtPasswordVisible;
+
+    @FXML
+    private Button btnShowPassword;
+
+    @FXML
     private Button btnLogin;
 
     @FXML
@@ -60,6 +66,27 @@ public class AppController {
     public AppController() {
         this.usuarioDAO = new UsuarioDAO(new UsuarioDAOImpl());
         this.clienteDAO = new ClienteDAO(new ClienteDAOImpl());
+    }
+
+    @FXML
+    public void initialize() {
+        // Sync text fields
+        txtPasswordVisible.textProperty().bindBidirectional(txtPassword.textProperty());
+    }
+
+    @FXML
+    public void onTogglePasswordVisibility() {
+        if (txtPassword.isVisible()) {
+            txtPassword.setVisible(false);
+            txtPassword.setManaged(false);
+            txtPasswordVisible.setVisible(true);
+            txtPasswordVisible.setManaged(true);
+        } else {
+            txtPassword.setVisible(true);
+            txtPassword.setManaged(true);
+            txtPasswordVisible.setVisible(false);
+            txtPasswordVisible.setManaged(false);
+        }
     }
 
     @FXML
