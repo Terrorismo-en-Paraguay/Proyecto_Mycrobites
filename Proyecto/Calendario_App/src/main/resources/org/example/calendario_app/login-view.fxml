@@ -106,7 +106,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
                <children>
-                  <PasswordField fx:id="txtPassword" promptText="Introduce tu contraseña" styleClass="input-field" />
+                  <PasswordField fx:id="txtPassword"  promptText="Introduce tu contraseña" styleClass="input-field" />
                   <TextField fx:id="txtPasswordVisible" managed="false" promptText="Introduce tu contraseña" styleClass="input-field" visible="false" />
                   <Button fx:id="btnShowPassword" mnemonicParsing="false" onAction="#onTogglePasswordVisibility" styleClass="icon-button" text="👁">
                      <StackPane.margin>
