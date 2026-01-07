@@ -107,13 +107,13 @@
                         
                         <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" spacing="15.0">
                              <HBox styleClass="view-toggle-group">
-                                 <ToggleButton selected="true" text="Día">
+                                 <ToggleButton fx:id="btnViewDay" onAction="#onViewChanged" text="Día">
                                      <toggleGroup>
                                          <ToggleGroup fx:id="viewGroup"/>
                                      </toggleGroup>
                                  </ToggleButton>
-                                 <ToggleButton text="Semana" toggleGroup="$viewGroup"/>
-                                 <ToggleButton text="Mes"  toggleGroup="$viewGroup"/>
+                                 <ToggleButton fx:id="btnViewWeek" onAction="#onViewChanged" text="Semana" toggleGroup="$viewGroup"/>
+                                 <ToggleButton fx:id="btnViewMonth" onAction="#onViewChanged" selected="true" text="Mes" toggleGroup="$viewGroup"/>
                              </HBox>
                              
                              <Button fx:id="btnCreateEvent" styleClass="btn-primary-gradient" text="+ Crear Evento" />

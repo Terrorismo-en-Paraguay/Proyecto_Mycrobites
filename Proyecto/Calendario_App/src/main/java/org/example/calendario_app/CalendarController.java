@@ -3,11 +3,7 @@ package org.example.calendario_app;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -62,6 +58,22 @@ public class CalendarController {
     private GridPane miniCalendarGrid;
 
     @FXML
+    private ToggleButton btnViewDay;
+
+    @FXML
+    private ToggleButton btnViewWeek;
+
+    @FXML
+    private ToggleButton btnViewMonth;
+
+    private enum CalendarView {
+        MONTH, WEEK, DAY
+    }
+
+    private CalendarView currentView = CalendarView.MONTH;
+    private LocalDate currentDate;
+
+    @FXML
     private Button btnCreateEvent;
 
     @FXML
@@ -70,7 +82,7 @@ public class CalendarController {
     @FXML
     private VBox myCalendarsContainer;
 
-    private YearMonth currentYearMonth;
+    // private YearMonth currentYearMonth; // Replaced by currentDate
     private final List<Evento> events = new ArrayList<>();
     private final List<Etiqueta> labels = new ArrayList<>();
     private EventoDAO eventoDAO;
@@ -88,7 +100,7 @@ public class CalendarController {
         loadLabels();
         loadHolidays();
 
-        currentYearMonth = YearMonth.now();
+        currentDate = LocalDate.now();
 
         // Set user initial
         if (Session.getInstance().getUsuario() != null) {
@@ -114,13 +126,21 @@ public class CalendarController {
         drawMiniCalendar();
 
         btnPrev.setOnAction(e -> {
-            currentYearMonth = currentYearMonth.minusMonths(1);
+            switch (currentView) {
+                case MONTH -> currentDate = currentDate.minusMonths(1);
+                case WEEK -> currentDate = currentDate.minusWeeks(1);
+                case DAY -> currentDate = currentDate.minusDays(1);
+            }
             drawCalendar();
             drawMiniCalendar();
         });
 
         btnNext.setOnAction(e -> {
-            currentYearMonth = currentYearMonth.plusMonths(1);
+            switch (currentView) {
+                case MONTH -> currentDate = currentDate.plusMonths(1);
+                case WEEK -> currentDate = currentDate.plusWeeks(1);
+                case DAY -> currentDate = currentDate.plusDays(1);
+            }
             drawCalendar();
             drawMiniCalendar();
         });
@@ -242,23 +262,71 @@ public class CalendarController {
         }
     }
 
-    private void drawCalendar() {
-        // Update Header Label
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.forLanguageTag("es-ES"));
-        String formattedDate = currentYearMonth.format(formatter);
-        // Capitalize first letter
-        formattedDate = formattedDate.substring(0, 1).toUpperCase() + formattedDate.substring(1);
-        monthYearLabel.setText(formattedDate);
+    @FXML
+    public void onViewChanged() {
+        if (btnViewDay.isSelected()) {
+            currentView = CalendarView.DAY;
+        } else if (btnViewWeek.isSelected()) {
+            currentView = CalendarView.WEEK;
+        } else {
+            currentView = CalendarView.MONTH;
+        }
+        drawCalendar();
+    }
 
-        // Clear grid but keep headers (Row 0)
-        // A simple way is to remove nodes that are in row > 0
-        calendarGrid.getChildren().removeIf(node -> {
-            Integer rowIndex = GridPane.getRowIndex(node);
-            return rowIndex != null && rowIndex > 0;
-        });
+    private void drawCalendar() {
+        // Clear grid entirely (headers will be re-added or kept depending on view)
+        // Simplest strategy: Clear all children and redraw headers + content per view
+        calendarGrid.getChildren().clear();
+
+        // Update Header Label based on view
+        DateTimeFormatter formatter;
+        String formattedDate;
+
+        switch (currentView) {
+            case MONTH -> {
+                formatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.forLanguageTag("es-ES"));
+                formattedDate = currentDate.format(formatter);
+                monthYearLabel.setText(formattedDate.substring(0, 1).toUpperCase() + formattedDate.substring(1));
+                drawMonthView();
+            }
+            case WEEK -> {
+                DateTimeFormatter weekFormatter = DateTimeFormatter.ofPattern("MMM yyyy",
+                        Locale.forLanguageTag("es-ES"));
+                // Show range? or just Month of start date
+                formattedDate = currentDate.format(weekFormatter);
+                monthYearLabel.setText(
+                        "Semana del " + currentDate.format(DateTimeFormatter.ofPattern("d")) + " - " + formattedDate);
+                drawWeekView();
+            }
+            case DAY -> {
+                formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("es-ES"));
+                formattedDate = currentDate.format(formatter);
+                monthYearLabel.setText(formattedDate);
+                drawDayView();
+            }
+        }
+    }
+
+    private void drawWeekHeader() {
+        String[] days = { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
+        for (int i = 0; i < 7; i++) {
+            Label label = new Label(days[i]);
+            label.getStyleClass().add("day-header");
+            GridPane.setHalignment(label, javafx.geometry.HPos.CENTER);
+            calendarGrid.add(label, i, 0);
+        }
+    }
+
+    private void drawMonthView() {
+        drawWeekHeader();
+
+        // Update Header Label - Already done in drawCalendar switch
+        // Just draw the grid
 
         // Calculate days
-        LocalDate firstOfMonth = currentYearMonth.atDay(1);
+        LocalDate firstOfMonth = YearMonth.from(currentDate).atDay(1);
+        // ... rest of logic ...
         DayOfWeek firstDayOfWeek = firstOfMonth.getDayOfWeek();
         int dayOfWeekValue = firstDayOfWeek.getValue(); // Monday = 1, Sunday = 7
 
@@ -275,7 +343,7 @@ public class CalendarController {
                 cell.setSpacing(2);
 
                 // Style
-                boolean isCurrentMonth = dateIterator.getMonth().equals(currentYearMonth.getMonth());
+                boolean isCurrentMonth = dateIterator.getMonth().equals(currentDate.getMonth());
                 if (isCurrentMonth) {
                     cell.getStyleClass().add("day-cell");
                 } else {
@@ -334,6 +402,83 @@ public class CalendarController {
                 dateIterator = dateIterator.plusDays(1);
             }
         }
+    }
+
+    private void drawWeekView() {
+        drawWeekHeader();
+
+        // Find start of week (Monday)
+        LocalDate startOfWeek = currentDate.minusDays(currentDate.getDayOfWeek().getValue() - 1);
+        LocalDate dateIterator = startOfWeek;
+
+        // One row of tall cells
+        for (int col = 0; col < 7; col++) {
+            VBox cell = createDayCell(dateIterator, false);
+            cell.setPrefHeight(600); // Taller for week view
+            GridPane.setVgrow(cell, javafx.scene.layout.Priority.ALWAYS);
+            calendarGrid.add(cell, col, 1);
+            dateIterator = dateIterator.plusDays(1);
+        }
+    }
+
+    private void drawDayView() {
+        // Single column, single cell
+        VBox cell = createDayCell(currentDate, false);
+        cell.setPrefHeight(600);
+        GridPane.setHgrow(cell, javafx.scene.layout.Priority.ALWAYS);
+        GridPane.setVgrow(cell, javafx.scene.layout.Priority.ALWAYS);
+
+        calendarGrid.add(cell, 0, 0);
+        GridPane.setColumnSpan(cell, 7);
+        GridPane.setRowSpan(cell, 7);
+    }
+
+    private VBox createDayCell(LocalDate date, boolean dimNonCurrentMonth) {
+        VBox cell = new VBox();
+        cell.setSpacing(2);
+
+        boolean isCurrentMonth = date.getMonth().equals(currentDate.getMonth());
+        if (!dimNonCurrentMonth || isCurrentMonth) {
+            cell.getStyleClass().add("day-cell");
+        } else {
+            cell.getStyleClass().add("day-cell-dimmed");
+        }
+
+        Label dayLabel = new Label(String.valueOf(date.getDayOfMonth()));
+        dayLabel.getStyleClass().add("day-label");
+        cell.getChildren().add(dayLabel);
+
+        // Add Holidays
+        for (Festivo festivo : holidays) {
+            if (festivo.getDia() == date.getDayOfMonth() && festivo.getMes() == date.getMonthValue()) {
+                addHolidayLabel(cell, festivo);
+            }
+        }
+
+        // Add Events
+        List<Integer> visibleLabelIds = new ArrayList<>();
+        for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox cb = (CheckBox) node;
+                if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                    visibleLabelIds.add((Integer) cb.getUserData());
+                }
+            }
+        }
+
+        for (Evento event : events) {
+            boolean isVisible = true;
+            if (event.getId_etiqueta() != null) {
+                if (!visibleLabelIds.contains(event.getId_etiqueta())) {
+                    isVisible = false;
+                }
+            }
+
+            if (isVisible && event.getFecha().equals(date)) {
+                addEventLabel(cell, event);
+            }
+        }
+        return cell;
     }
 
     private void openEventDetailsDialog(Evento event) {
@@ -408,7 +553,7 @@ public class CalendarController {
     private void drawMiniCalendar() {
         // Update Header Label
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.forLanguageTag("es-ES"));
-        String formattedDate = currentYearMonth.format(formatter);
+        String formattedDate = currentDate.format(formatter);
         formattedDate = formattedDate.substring(0, 1).toUpperCase() + formattedDate.substring(1);
         miniMonthLabel.setText(formattedDate);
 
@@ -419,7 +564,7 @@ public class CalendarController {
         });
 
         // Calculate days (same as main calendar)
-        LocalDate firstOfMonth = currentYearMonth.atDay(1);
+        LocalDate firstOfMonth = YearMonth.from(currentDate).atDay(1);
         int dayOfWeekValue = firstOfMonth.getDayOfWeek().getValue();
         int offset = dayOfWeekValue - 1;
         LocalDate dateIterator = firstOfMonth.minusDays(offset);
@@ -428,7 +573,7 @@ public class CalendarController {
         for (int row = 1; row <= 6; row++) {
             for (int col = 0; col < 7; col++) {
                 Label dayLabel = new Label(String.valueOf(dateIterator.getDayOfMonth()));
-                boolean isCurrentMonth = dateIterator.getMonth().equals(currentYearMonth.getMonth());
+                boolean isCurrentMonth = dateIterator.getMonth().equals(currentDate.getMonth());
 
                 if (isCurrentMonth) {
                     dayLabel.setStyle("-fx-text-fill: white; -fx-padding: 3;");
