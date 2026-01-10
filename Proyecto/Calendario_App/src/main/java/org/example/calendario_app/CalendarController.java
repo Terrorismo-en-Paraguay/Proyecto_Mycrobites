@@ -353,6 +353,9 @@ public class CalendarController {
                 // Day Label
                 Label dayLabel = new Label(String.valueOf(dateIterator.getDayOfMonth()));
                 dayLabel.getStyleClass().add("day-label");
+                if (dateIterator.equals(LocalDate.now())) {
+                    dayLabel.getStyleClass().add("current-day-label");
+                }
                 cell.getChildren().add(dayLabel);
 
                 // Add Holidays
@@ -446,6 +449,9 @@ public class CalendarController {
 
         Label dayLabel = new Label(String.valueOf(date.getDayOfMonth()));
         dayLabel.getStyleClass().add("day-label");
+        if (date.equals(LocalDate.now())) {
+            dayLabel.getStyleClass().add("current-day-label");
+        }
         cell.getChildren().add(dayLabel);
 
         // Add Holidays

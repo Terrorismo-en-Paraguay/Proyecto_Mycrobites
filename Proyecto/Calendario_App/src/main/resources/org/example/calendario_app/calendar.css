@@ -34,6 +34,18 @@
     -fx-alignment: top-right;
 }
 
+.current-day-label {
+    -fx-background-color: white;
+    -fx-text-fill: -fx-bg-darker; /* Dark text to contrast with white circle */
+    -fx-background-radius: 50%;
+    -fx-min-width: 25px;
+    -fx-min-height: 25px;
+    -fx-max-width: 25px;
+    -fx-max-height: 25px;
+    -fx-alignment: center;
+    -fx-padding: 0;
+}
+
 /* Events */
 .event-label-blue {
     -fx-background-color: #34495E;
