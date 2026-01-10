@@ -5,7 +5,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import org.example.calendario_app.model.Grupo;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LabelDialogController {
@@ -15,6 +18,9 @@ public class LabelDialogController {
 
     @FXML
     private ComboBox<String> colorComboBox;
+
+    @FXML
+    private ComboBox<Grupo> groupComboBox;
 
     @FXML
     private Button cancelButton;
@@ -39,12 +45,28 @@ public class LabelDialogController {
         colorComboBox.getItems().addAll(colorMap.keySet());
         colorComboBox.getSelectionModel().selectFirst();
 
+        groupComboBox.setConverter(new StringConverter<Grupo>() {
+            @Override
+            public String toString(Grupo object) {
+                return object != null ? object.getNombre() : "";
+            }
+
+            @Override
+            public Grupo fromString(String string) {
+                return null; // Not needed
+            }
+        });
+
         saveButton.setOnAction(e -> handleSave());
         cancelButton.setOnAction(e -> dialogStage.close());
     }
 
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
+    }
+
+    public void setAvailableGroups(List<Grupo> groups) {
+        groupComboBox.getItems().setAll(groups);
     }
 
     public boolean isSaveClicked() {
@@ -57,6 +79,10 @@ public class LabelDialogController {
 
     public String getLabelColorClass() {
         return labelColorClass;
+    }
+
+    public Grupo getSelectedGroup() {
+        return groupComboBox.getValue();
     }
 
     private void handleSave() {

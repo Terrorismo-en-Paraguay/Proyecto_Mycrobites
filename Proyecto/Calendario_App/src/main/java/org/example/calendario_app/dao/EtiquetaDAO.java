@@ -6,7 +6,7 @@ import java.util.List;
 public interface EtiquetaDAO {
     List<Etiqueta> findAllByUsuarioId(int idUsuario);
 
-    int save(Etiqueta etiqueta, int idUsuario);
+    int save(Etiqueta etiqueta, int idUsuario, Integer idGrupo);
 
     void delete(int id);
 }

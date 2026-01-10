@@ -12,7 +12,10 @@ import org.example.calendario_app.dao.ClienteDAO;
 import org.example.calendario_app.dao.UsuarioDAO;
 import org.example.calendario_app.dao.impl.ClienteDAOImpl;
 import org.example.calendario_app.dao.impl.UsuarioDAOImpl;
+import org.example.calendario_app.dao.GrupoDAO;
+import org.example.calendario_app.dao.impl.GrupoDAOImpl;
 import org.example.calendario_app.model.Cliente;
+import org.example.calendario_app.model.Grupo;
 import org.example.calendario_app.model.Usuario;
 import org.example.calendario_app.util.Session;
 
@@ -60,12 +63,14 @@ public class AppController {
 
     private UsuarioDAO usuarioDAO;
     private ClienteDAO clienteDAO;
+    private GrupoDAO grupoDAO;
 
     private boolean isLoginMode = true;
 
     public AppController() {
         this.usuarioDAO = new UsuarioDAO(new UsuarioDAOImpl());
         this.clienteDAO = new ClienteDAO(new ClienteDAOImpl());
+        this.grupoDAO = new GrupoDAO(new GrupoDAOImpl());
     }
 
     @FXML
@@ -183,9 +188,18 @@ public class AppController {
                 if (idCliente != -1) {
                     // 2. Crear Usuario vinculado al Cliente
                     Usuario nuevoUsuario = new Usuario(idCliente, email, password, "USER");
-                    boolean registroExitoso = usuarioDAO.registrar(nuevoUsuario);
+                    int idUsuario = usuarioDAO.registrar(nuevoUsuario);
 
-                    if (registroExitoso) {
+                    if (idUsuario != -1) {
+                        try {
+                            // 3. Crear Grupo Personal
+                            Grupo personalGroup = new Grupo("Personal", "Grupo personal por defecto");
+                            grupoDAO.create(personalGroup, idUsuario);
+                        } catch (Exception e) {
+                            System.err.println("Error creando grupo personal: " + e.getMessage());
+                            // Consume error to proceed with success message
+                        }
+
                         showAlert(Alert.AlertType.INFORMATION, "Registro Exitoso",
                                 "Usuario registrado correctamente. Ahora puede iniciar sesión.");
                         onToggleLogin();

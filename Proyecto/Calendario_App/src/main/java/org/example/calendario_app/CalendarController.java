@@ -34,6 +34,11 @@ import org.example.calendario_app.dao.FestivoDAO;
 import org.example.calendario_app.dao.impl.FestivoDAOImpl;
 import org.example.calendario_app.model.Festivo;
 
+import org.example.calendario_app.model.Grupo;
+import org.example.calendario_app.dao.GrupoDAO;
+import org.example.calendario_app.dao.impl.GrupoDAOImpl;
+import org.example.calendario_app.util.Session;
+
 public class CalendarController {
 
     @FXML
@@ -86,13 +91,20 @@ public class CalendarController {
     private Button btnCreateLabel;
 
     @FXML
+    private Button btnCreateGroup;
+
+    @FXML
     private VBox myCalendarsContainer;
+
+    @FXML
+    private VBox sharedCalendarsContainer;
 
     // private YearMonth currentYearMonth; // Replaced by currentDate
     private final List<Evento> events = new ArrayList<>();
     private final List<Etiqueta> labels = new ArrayList<>();
     private EventoDAO eventoDAO;
     private EtiquetaDAO etiquetaDAO;
+    private GrupoDAO grupoDAO;
     private FestivoDAO festivoDAO;
     private final List<Festivo> holidays = new ArrayList<>();
 
@@ -100,9 +112,11 @@ public class CalendarController {
     public void initialize() {
         eventoDAO = new EventoDAOImpl();
         etiquetaDAO = new EtiquetaDAOImpl();
+        grupoDAO = new GrupoDAO(new GrupoDAOImpl());
         festivoDAO = new FestivoDAOImpl();
 
         loadEvents();
+        loadUserGroups(); // New method
         loadLabels();
         loadHolidays();
 
@@ -144,6 +158,77 @@ public class CalendarController {
 
         btnCreateEvent.setOnAction(e -> openCreateEventDialog());
         btnCreateLabel.setOnAction(e -> openCreateLabelDialog());
+        btnCreateGroup.setOnAction(e -> openCreateGroupDialog());
+    }
+
+    private void loadUserGroups() {
+        if (Session.getInstance().getUsuario() != null) {
+            int userId = Session.getInstance().getUsuario().getId();
+            List<Grupo> userGroups = grupoDAO.findAllByUserId(userId);
+            sharedCalendarsContainer.getChildren().clear(); // Clear existing
+            for (Grupo group : userGroups) {
+                addGroupCheckBox(group);
+            }
+        }
+    }
+
+    private void addGroupCheckBox(Grupo group) {
+        CheckBox newGroup = new CheckBox(group.getNombre());
+        newGroup.setSelected(true);
+        newGroup.getStyleClass().add("calendar-check-orange"); // Ensure this class exists or default color logic
+        newGroup.setUserData(group.getId_grupo());
+        sharedCalendarsContainer.getChildren().add(newGroup);
+    }
+
+    private void openCreateGroupDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("group-dialog.fxml"));
+            VBox page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Crear Nuevo Grupo");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(btnCreateGroup.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            GroupDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setAvailableLabels(labels); // Pass existing labels
+
+            // Pass DAOs for label creation within group dialog
+            controller.setEtiquetaDAO(etiquetaDAO);
+            controller.setGrupoDAO(grupoDAO);
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                String groupName = controller.getGroupName();
+                // Get description if available from controller, or default
+                // For now assuming we just have name in this block, but controller has
+                // descriptionArea
+                // casting controller to access fields if getters missing or update controller
+                // Actually GroupDialogController needs getGroupDescription()
+
+                if (groupName != null && !groupName.isEmpty()) {
+                    if (Session.getInstance().getUsuario() != null) {
+                        String description = controller.getGroupDescription();
+                        if (description == null)
+                            description = "";
+                        Grupo newGroup = new Grupo(groupName, description);
+                        int creatorId = Session.getInstance().getUsuario().getId();
+                        int groupId = grupoDAO.create(newGroup, creatorId);
+
+                        if (groupId != -1) {
+                            newGroup.setId_grupo(groupId);
+                            addGroupCheckBox(newGroup);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void openCreateLabelDialog() {
@@ -161,18 +246,35 @@ public class CalendarController {
             LabelDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
 
+            // Pass available groups
+            if (Session.getInstance().getUsuario() != null) {
+                int userId = Session.getInstance().getUsuario().getId();
+                List<Grupo> userGroups = grupoDAO.findAllByUserId(userId);
+                controller.setAvailableGroups(userGroups);
+            }
+
             dialogStage.showAndWait();
 
             if (controller.isSaveClicked()) {
-                String name = controller.getLabelName();
-                String colorClass = controller.getLabelColorClass();
-                if (Session.getInstance().getUsuario() != null) {
-                    // Store the short code (e.g. "purple") in DB
-                    Etiqueta newEtiqueta = new Etiqueta(name, colorClass);
-                    int userId = Session.getInstance().getUsuario().getId();
-                    if (etiquetaDAO.save(newEtiqueta, userId) > 0) {
-                        labels.add(newEtiqueta); // Add to local list so it appears in Event Dialog
-                        addCalendarLabelUI(newEtiqueta);
+                String labelName = controller.getLabelName();
+                String labelColorClass = controller.getLabelColorClass();
+                Grupo selectedGroup = controller.getSelectedGroup();
+
+                if (labelName != null && !labelName.isEmpty() && labelColorClass != null) {
+                    Etiqueta newLabel = new Etiqueta(labelName, labelColorClass);
+
+                    if (Session.getInstance().getUsuario() != null) {
+                        int userId = Session.getInstance().getUsuario().getId();
+                        Integer groupId = (selectedGroup != null) ? selectedGroup.getId_grupo() : null;
+
+                        int labelId = etiquetaDAO.save(newLabel, userId, groupId);
+                        // If linking to group, maybe UI update is different?
+                        // For now just reload labels or add to sidebar if sidebar shows personal
+                        // labels.
+                        // Currently 'loadLabels()' adds to sidebar.
+                        // If it's a group label, should it appear in sidebar?
+                        // Assuming yes for now, re-load or add.
+                        loadLabels();
                     }
                 }
             }

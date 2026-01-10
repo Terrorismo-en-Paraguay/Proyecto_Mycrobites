@@ -33,20 +33,27 @@ public class UsuarioDAOImpl {
         return usuario;
     }
 
-    public boolean registrar(Usuario usuario) {
+    public int registrar(Usuario usuario) {
         String query = "INSERT INTO usuarios (id_cliente, correo, password_hash) VALUES (?, ?, ?)";
         try (Connection conn = databaseConnection.getConn();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setInt(1, usuario.getId_cliente());
             pstmt.setString(2, usuario.getCorreo());
             pstmt.setString(3, usuario.getPassword_hash());
 
             int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getInt(1);
+                    }
+                }
+            }
+            return -1;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 }

@@ -20,7 +20,7 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean registrar(Usuario usuario) {
+    public int registrar(Usuario usuario) {
         return usuarioDAO.registrar(usuario);
     }
 }

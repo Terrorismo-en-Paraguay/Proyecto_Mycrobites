@@ -42,9 +42,10 @@ public class EtiquetaDAOImpl implements EtiquetaDAO {
     }
 
     @Override
-    public int save(Etiqueta etiqueta, int idUsuario) {
+    public int save(Etiqueta etiqueta, int idUsuario, Integer idGrupo) {
         String insertEtiqueta = "INSERT INTO etiquetas (nombre, color) VALUES (?, ?)";
         String linkUser = "INSERT INTO etiquetas_usuarios (id_etiqueta, id_usuario) VALUES (?, ?)";
+        String linkGroup = "INSERT INTO etiquetas_grupos (id_etiqueta, id_grupo) VALUES (?, ?)";
 
         int idGenerado = -1;
         Connection conn = null;
@@ -67,12 +68,28 @@ public class EtiquetaDAOImpl implements EtiquetaDAO {
                 }
             }
 
-            // 2. Link to User
+            // 2. Link to User or Group
             if (idGenerado != -1) {
-                try (PreparedStatement pstmt2 = conn.prepareStatement(linkUser)) {
-                    pstmt2.setInt(1, idGenerado);
-                    pstmt2.setInt(2, idUsuario);
-                    pstmt2.executeUpdate();
+                // If linked to group, we might still want to link to user or not?
+                // Requirement says associate to group.
+                // Assuming unrelated logic: User can have personal labels, Group can have
+                // labels.
+
+                if (idGrupo != null) {
+                    try (PreparedStatement pstmt3 = conn.prepareStatement(linkGroup)) {
+                        pstmt3.setInt(1, idGenerado);
+                        pstmt3.setInt(2, idGrupo);
+                        pstmt3.executeUpdate();
+                    }
+                } else {
+                    // Only link to user if NOT a group label? Or always link to user?
+                    // Typically 'Personal' vs 'Group' labels.
+                    // If idGrupo is null, link to user.
+                    try (PreparedStatement pstmt2 = conn.prepareStatement(linkUser)) {
+                        pstmt2.setInt(1, idGenerado);
+                        pstmt2.setInt(2, idUsuario);
+                        pstmt2.executeUpdate();
+                    }
                 }
             }
 
