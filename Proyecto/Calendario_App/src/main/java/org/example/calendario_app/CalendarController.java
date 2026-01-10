@@ -49,6 +49,9 @@ public class CalendarController {
     private Button btnNext;
 
     @FXML
+    private Button btnToday;
+
+    @FXML
     private Label miniMonthLabel;
 
     @FXML
@@ -254,6 +257,13 @@ public class CalendarController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    public void goToToday() {
+        currentDate = LocalDate.now();
+        drawCalendar();
+        drawMiniCalendar();
     }
 
     @FXML
