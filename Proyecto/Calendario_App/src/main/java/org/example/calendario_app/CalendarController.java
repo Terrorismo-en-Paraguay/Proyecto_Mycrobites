@@ -11,6 +11,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Cursor;
 import javafx.geometry.Side;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.Priority;
+import javafx.scene.shape.Line;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -416,15 +419,131 @@ public class CalendarController {
     }
 
     private void drawDayView() {
-        // Single column, single cell
-        VBox cell = createDayCell(currentDate, false);
-        cell.setPrefHeight(600);
-        GridPane.setHgrow(cell, javafx.scene.layout.Priority.ALWAYS);
-        GridPane.setVgrow(cell, javafx.scene.layout.Priority.ALWAYS);
+        calendarGrid.getChildren().clear();
 
-        calendarGrid.add(cell, 0, 0);
-        GridPane.setColumnSpan(cell, 7);
-        GridPane.setRowSpan(cell, 7);
+        // 1. Create ScrollPane for vertical scrolling
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPannable(true);
+        // Style class for scroll pane if needed
+        scrollPane.getStyleClass().add("timeline-scroll-pane");
+
+        // 2. Create the Timeline Grid
+        GridPane timelineGrid = new GridPane();
+        timelineGrid.getStyleClass().add("timeline-grid");
+
+        scrollPane.setContent(timelineGrid); // Fix: Set content
+
+        // Constraints: Col 0 for Time (Fixed), Col 1 for Events (Grow)
+        javafx.scene.layout.ColumnConstraints colTime = new javafx.scene.layout.ColumnConstraints();
+        colTime.setPercentWidth(10); // ~10% width for time
+        colTime.setHalignment(javafx.geometry.HPos.RIGHT);
+
+        javafx.scene.layout.ColumnConstraints colEvents = new javafx.scene.layout.ColumnConstraints();
+        colEvents.setPercentWidth(90); // ~90% for content
+        colEvents.setHgrow(Priority.ALWAYS);
+
+        timelineGrid.getColumnConstraints().addAll(colTime, colEvents);
+
+        // 3. Populate Rows (0 to 23 hours)
+        for (int hour = 0; hour < 24; hour++) {
+            // Row Constraints (Fixed height per hour, e.g., 60px)
+            RowConstraints rowConst = new RowConstraints();
+            rowConst.setMinHeight(60);
+            rowConst.setPrefHeight(60);
+            rowConst.setVgrow(Priority.NEVER);
+            timelineGrid.getRowConstraints().add(rowConst);
+
+            // Time Label
+            Label timeLabel = new Label(String.format("%02d:00", hour));
+            timeLabel.getStyleClass().add("timeline-time-label");
+            // Add margin to separate from line
+            GridPane.setMargin(timeLabel, new javafx.geometry.Insets(0, 10, 0, 0));
+            // Align to top-right of cell
+            GridPane.setValignment(timeLabel, javafx.geometry.VPos.TOP);
+            timelineGrid.add(timeLabel, 0, hour);
+
+            // Horizontal Line / Cell Border
+            // We can style the cell itself, or add a container
+            VBox eventContainer = new VBox();
+            eventContainer.getStyleClass().add("timeline-cell");
+            // Add top border via CSS to simulate grid line
+            timelineGrid.add(eventContainer, 1, hour);
+        }
+
+        // 4. Place Events
+        // Filter events for today
+        List<Evento> todaysEvents = new ArrayList<>();
+        for (Evento event : events) {
+            if (event.getFecha().equals(currentDate)) {
+                todaysEvents.add(event);
+            }
+        }
+
+        for (Evento event : todaysEvents) {
+            int startHour = event.getFecha_inicio().getHour();
+            int endHour = event.getFecha_fin().getHour();
+
+            // Handle edge case where end time is 00:00 of next day (shows as 0 hour?)
+            // Or if start == end (less than 1 hour duration)
+            if (endHour <= startHour) {
+                endHour = startHour + 1; // Minimum 1 row span visually
+            }
+            // Cap at 24 logic if needed, but simple for now
+
+            int rowSpan = endHour - startHour;
+
+            // Create Event Node
+            VBox eventNode = new VBox();
+            eventNode.getStyleClass().add("timeline-event-entry");
+            // Add color style
+            String styleClass = "event-label-purple"; // Fallback
+            if (event.getId_etiqueta() != null) {
+                for (Etiqueta label : labels) {
+                    if (label.getId() == event.getId_etiqueta()) {
+                        String labelColor = label.getColor();
+                        if (labelColor != null && !labelColor.isEmpty()) {
+                            String shortColor = labelColor.replace("calendar-check-", "");
+                            styleClass = "event-label-" + shortColor;
+                        }
+                        break;
+                    }
+                }
+            }
+            eventNode.getStyleClass().add(styleClass);
+
+            Label titleLabel = new Label(event.getTitulo());
+            titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
+
+            String times = event.getFecha_inicio().format(DateTimeFormatter.ofPattern("HH:mm")) +
+                    " - " + event.getFecha_fin().format(DateTimeFormatter.ofPattern("HH:mm"));
+            Label timeRangeLabel = new Label(times);
+            timeRangeLabel.setStyle("-fx-text-fill: white; -fx-font-size: 0.9em;");
+
+            eventNode.getChildren().addAll(titleLabel, timeRangeLabel);
+
+            // Click action
+            eventNode.setOnMouseClicked(e -> {
+                e.consume();
+                openEventDetailsDialog(event);
+            });
+            eventNode.setCursor(Cursor.HAND);
+
+            // Add to Grid
+            timelineGrid.add(eventNode, 1, startHour);
+            GridPane.setRowSpan(eventNode, rowSpan);
+            // Allow it to fill width
+            GridPane.setHgrow(eventNode, Priority.ALWAYS);
+            GridPane.setFillWidth(eventNode, true);
+            // Margin to avoid overlapping lines slightly
+            GridPane.setMargin(eventNode, new javafx.geometry.Insets(2, 5, 2, 0));
+        }
+
+        // Add ScrollPane to main grid
+        // Spanning all rows/cols of the base calendarGrid
+        calendarGrid.add(scrollPane, 0, 0);
+        GridPane.setColumnSpan(scrollPane, 7); // Span full width
+        GridPane.setRowSpan(scrollPane, 6); // Span full height
     }
 
     private VBox createDayCell(LocalDate date, boolean dimNonCurrentMonth) {

@@ -36,7 +36,8 @@
 
 .current-day-label {
     -fx-background-color: white;
-    -fx-text-fill: -fx-bg-darker; /* Dark text to contrast with white circle */
+    -fx-text-fill: -fx-bg-darker;
+    /* Dark text to contrast with white circle */
     -fx-background-radius: 50%;
     -fx-min-width: 25px;
     -fx-min-height: 25px;
@@ -456,4 +457,37 @@
 .combo-box-popup .list-cell:filled:hover {
     -fx-background-color: #A066F5;
     -fx-text-fill: white;
+}
+
+/* Timeline / Day View Styles */
+.timeline-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.timeline-scroll-pane>.viewport {
+    -fx-background-color: transparent;
+}
+
+.timeline-grid {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.timeline-time-label {
+    -fx-text-fill: #808080;
+    -fx-font-size: 11px;
+    -fx-translate-y: -8;
+}
+
+.timeline-cell {
+    -fx-border-color: #383B42;
+    -fx-border-width: 1 0 0 0;
+    -fx-background-color: transparent;
+}
+
+.timeline-event-entry {
+    -fx-background-radius: 4;
+    -fx-padding: 5 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
 }
