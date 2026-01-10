@@ -102,17 +102,8 @@ public class CalendarController {
 
         currentDate = LocalDate.now();
 
-        // Set user initial
         if (Session.getInstance().getUsuario() != null) {
-            String name = Session.getInstance().getUsuario().getCorreo(); // Using email or fetch name from Cliente
-                                                                          // logic if preferred, but schema splits them.
-                                                                          // Stick to simple user init.
-            // Actually, Usuario has id_cliente, I can fetch Cliente if needed, but for now
-            // let's use what we have or just skip name if not available in Usuario.
-            // Wait, the prompt implies "change code according to tables".
-            // Usuario has correo. Cliente has name.
-            // Session has both set usually?
-            // Let's assume Session.getCliente() is still populated on login!
+            String name = Session.getInstance().getUsuario().getCorreo();
             if (Session.getInstance().getCliente() != null) {
                 String initName = Session.getInstance().getCliente().getNombre();
                 if (initName != null && !initName.isEmpty()) {
