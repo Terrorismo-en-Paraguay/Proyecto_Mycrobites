@@ -162,8 +162,6 @@
                     
                     <!-- Grid Lines / Cells will be populated by controller or hardcoded for now -->
                     <!-- Grid Cells will be populated dynamically -->
-
-
                 </GridPane>
             </center>
         </BorderPane>
