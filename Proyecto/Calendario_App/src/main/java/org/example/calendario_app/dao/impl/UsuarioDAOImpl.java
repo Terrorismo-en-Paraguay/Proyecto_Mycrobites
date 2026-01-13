@@ -56,4 +56,26 @@ public class UsuarioDAOImpl {
             return -1;
         }
     }
+
+    public Usuario findByEmail(String email) {
+        Usuario usuario = null;
+        String query = "SELECT * FROM usuarios WHERE correo = ?";
+        try (Connection conn = databaseConnection.getConn();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    usuario = new Usuario(
+                            rs.getInt("id_usuario"),
+                            rs.getInt("id_cliente"),
+                            rs.getString("correo"),
+                            rs.getString("password_hash"),
+                            "USER");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return usuario;
+    }
 }

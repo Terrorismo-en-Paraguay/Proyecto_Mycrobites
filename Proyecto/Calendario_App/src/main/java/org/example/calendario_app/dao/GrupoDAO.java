@@ -19,4 +19,8 @@ public class GrupoDAO {
     public List<Grupo> findAllByUserId(int userId) {
         return grupoDAO.findAllByUserId(userId);
     }
+
+    public void addMember(int groupId, int userId, String role) {
+        grupoDAO.addMember(groupId, userId, role);
+    }
 }

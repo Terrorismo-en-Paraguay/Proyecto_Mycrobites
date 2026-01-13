@@ -111,6 +111,10 @@ public class GroupDialogController {
         return descriptionArea.getText();
     }
 
+    public List<GroupMember> getMembers() {
+        return members;
+    }
+
     public void setEtiquetaDAO(EtiquetaDAO etiquetaDAO) {
         this.etiquetaDAO = etiquetaDAO;
     }

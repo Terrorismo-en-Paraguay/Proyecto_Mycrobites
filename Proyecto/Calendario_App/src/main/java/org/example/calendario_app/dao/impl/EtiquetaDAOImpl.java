@@ -18,15 +18,23 @@ public class EtiquetaDAOImpl implements EtiquetaDAO {
     @Override
     public List<Etiqueta> findAllByUsuarioId(int idUsuario) {
         List<Etiqueta> etiquetas = new ArrayList<>();
-        // Join with etiquetas_usuarios to get labels for this user
-        String query = "SELECT e.* FROM etiquetas e " +
-                "JOIN etiquetas_usuarios eu ON e.id_etiqueta = eu.id_etiqueta " +
-                "WHERE eu.id_usuario = ?";
+        // Fetch both personal labels and labels from groups the user belongs to
+        String query = """
+                SELECT e.* FROM etiquetas e
+                JOIN etiquetas_usuarios eu ON e.id_etiqueta = eu.id_etiqueta
+                WHERE eu.id_usuario = ?
+                UNION
+                SELECT e.* FROM etiquetas e
+                JOIN etiquetas_grupos eg ON e.id_etiqueta = eg.id_etiqueta
+                JOIN grupos_usuarios gu ON eg.id_grupo = gu.id_grupo
+                WHERE gu.id_usuario = ?
+                """;
 
         try (Connection conn = databaseConnection.getConn();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, idUsuario);
+            pstmt.setInt(2, idUsuario);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     etiquetas.add(new Etiqueta(

@@ -119,4 +119,17 @@ public class GrupoDAOImpl {
         }
         return grupos;
     }
+
+    public void addMember(int groupId, int userId, String role) {
+        String insertMemberQuery = "INSERT INTO grupos_usuarios (id_grupo, id_usuario, rol) VALUES (?, ?, ?)";
+        try (Connection conn = databaseConnection.getConn();
+                PreparedStatement pstmt = conn.prepareStatement(insertMemberQuery)) {
+            pstmt.setInt(1, groupId);
+            pstmt.setInt(2, userId);
+            pstmt.setString(3, role);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

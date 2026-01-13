@@ -37,6 +37,9 @@ import org.example.calendario_app.model.Festivo;
 import org.example.calendario_app.model.Grupo;
 import org.example.calendario_app.dao.GrupoDAO;
 import org.example.calendario_app.dao.impl.GrupoDAOImpl;
+import org.example.calendario_app.dao.UsuarioDAO;
+import org.example.calendario_app.dao.impl.UsuarioDAOImpl;
+import org.example.calendario_app.model.Usuario;
 import org.example.calendario_app.util.Session;
 
 public class CalendarController {
@@ -105,6 +108,7 @@ public class CalendarController {
     private EventoDAO eventoDAO;
     private EtiquetaDAO etiquetaDAO;
     private GrupoDAO grupoDAO;
+    private UsuarioDAO usuarioDAO;
     private FestivoDAO festivoDAO;
     private final List<Festivo> holidays = new ArrayList<>();
 
@@ -113,6 +117,7 @@ public class CalendarController {
         eventoDAO = new EventoDAOImpl();
         etiquetaDAO = new EtiquetaDAOImpl();
         grupoDAO = new GrupoDAO(new GrupoDAOImpl());
+        usuarioDAO = new UsuarioDAO(new UsuarioDAOImpl());
         festivoDAO = new FestivoDAOImpl();
 
         loadEvents();
@@ -221,6 +226,16 @@ public class CalendarController {
 
                         if (groupId != -1) {
                             newGroup.setId_grupo(groupId);
+
+                            // Add invited members
+                            List<GroupDialogController.GroupMember> members = controller.getMembers();
+                            for (GroupDialogController.GroupMember member : members) {
+                                Usuario addedUser = usuarioDAO.findByEmail(member.email);
+                                if (addedUser != null) {
+                                    grupoDAO.addMember(groupId, addedUser.getId(), member.role.toLowerCase());
+                                }
+                            }
+
                             addGroupCheckBox(newGroup);
                         }
                     }

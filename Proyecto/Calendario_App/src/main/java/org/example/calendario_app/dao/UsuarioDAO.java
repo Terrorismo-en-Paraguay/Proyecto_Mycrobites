@@ -23,4 +23,8 @@ public class UsuarioDAO {
     public int registrar(Usuario usuario) {
         return usuarioDAO.registrar(usuario);
     }
+
+    public Usuario findByEmail(String email) {
+        return usuarioDAO.findByEmail(email);
+    }
 }
