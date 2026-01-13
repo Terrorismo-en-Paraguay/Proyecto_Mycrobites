@@ -260,6 +260,25 @@ public class GroupDialogController {
             nameField.setStyle("-fx-border-color: red;");
             return;
         }
+
+        // UX Improvement: Check if there is a pending email in the field that wasn't
+        // added
+        String pendingEmail = emailField.getText();
+        if (pendingEmail != null && !pendingEmail.isEmpty()) {
+            // Validate role
+            String role = roleComboBox.getValue();
+            if (role != null) {
+                // Determine if this email is already in the list
+                boolean alreadyAdded = members.stream().anyMatch(m -> m.email.equals(pendingEmail));
+                if (!alreadyAdded) {
+                    // Auto-add the member
+                    members.add(new GroupMember(pendingEmail, role));
+                    System.out.println("DEBUG: Auto-added pending member: " + pendingEmail);
+                }
+            }
+        }
+
+        System.out.println("DEBUG: Save clicked. Total members: " + members.size());
         saveClicked = true;
         dialogStage.close();
     }

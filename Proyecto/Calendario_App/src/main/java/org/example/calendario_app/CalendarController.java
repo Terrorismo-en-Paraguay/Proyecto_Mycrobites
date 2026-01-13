@@ -229,10 +229,18 @@ public class CalendarController {
 
                             // Add invited members
                             List<GroupDialogController.GroupMember> members = controller.getMembers();
+                            System.out.println("DEBUG: Members to add: " + members.size());
+
                             for (GroupDialogController.GroupMember member : members) {
-                                Usuario addedUser = usuarioDAO.findByEmail(member.email);
+                                String cleanEmail = member.email != null ? member.email.trim() : "";
+                                System.out.println("DEBUG: Processing member email: " + cleanEmail);
+
+                                Usuario addedUser = usuarioDAO.findByEmail(cleanEmail);
                                 if (addedUser != null) {
+                                    System.out.println("DEBUG: Found user ID: " + addedUser.getId());
                                     grupoDAO.addMember(groupId, addedUser.getId(), member.role.toLowerCase());
+                                } else {
+                                    System.out.println("DEBUG: User not found for email: " + cleanEmail);
                                 }
                             }
 

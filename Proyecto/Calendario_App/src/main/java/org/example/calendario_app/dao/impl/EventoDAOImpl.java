@@ -18,12 +18,49 @@ public class EventoDAOImpl implements EventoDAO {
     @Override
     public List<Evento> findAllByUsuarioId(int idUsuario) {
         List<Evento> eventos = new ArrayList<>();
-        String query = "SELECT * FROM eventos WHERE id_creador = ?";
+        // Query to get:
+        // 1. Events created by the user
+        // 2. Events that have a label which is shared with the user (via
+        // etiquetas_usuarios)
+        // 3. Events that have a label which is shared with a group the user is in (via
+        // etiquetas_grupos -> grupos_usuarios)
+
+        String query = """
+                    SELECT DISTINCT ev.*
+                    FROM events ev
+                    LEFT JOIN etiquetas e ON ev.id_etiqueta = e.id_etiqueta
+                    LEFT JOIN etiquetas_usuarios eu ON e.id_etiqueta = eu.id_etiqueta
+                    LEFT JOIN etiquetas_grupos eg ON e.id_etiqueta = eg.id_etiqueta
+                    LEFT JOIN grupos_usuarios gu ON eg.id_grupo = gu.id_grupo
+                    WHERE ev.id_creador = ?
+                       OR eu.id_usuario = ?
+                       OR gu.id_usuario = ?
+                """;
+
+        // Note: 'events' table name in original code was 'eventos'?
+        // Checking previous view_file of EventoDAOImpl...
+        // Original query was: "SELECT * FROM eventos WHERE id_creador = ?";
+        // So table name is 'eventos'.
+
+        String queryCorrected = """
+                    SELECT DISTINCT ev.*
+                    FROM eventos ev
+                    LEFT JOIN etiquetas e ON ev.id_etiqueta = e.id_etiqueta
+                    LEFT JOIN etiquetas_usuarios eu ON e.id_etiqueta = eu.id_etiqueta
+                    LEFT JOIN etiquetas_grupos eg ON e.id_etiqueta = eg.id_etiqueta
+                    LEFT JOIN grupos_usuarios gu ON eg.id_grupo = gu.id_grupo
+                    WHERE ev.id_creador = ?
+                       OR eu.id_usuario = ?
+                       OR gu.id_usuario = ?
+                """;
 
         try (Connection conn = databaseConnection.getConn();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(queryCorrected)) {
 
             pstmt.setInt(1, idUsuario);
+            pstmt.setInt(2, idUsuario);
+            pstmt.setInt(3, idUsuario);
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Timestamp startTs = rs.getTimestamp("fecha_inicio");

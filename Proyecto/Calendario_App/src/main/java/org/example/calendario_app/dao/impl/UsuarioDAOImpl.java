@@ -1,6 +1,5 @@
 package org.example.calendario_app.dao.impl;
 
-import org.example.calendario_app.dao.UsuarioDAO;
 import org.example.calendario_app.model.Usuario;
 import org.example.calendario_app.util.DatabaseConnection;
 
