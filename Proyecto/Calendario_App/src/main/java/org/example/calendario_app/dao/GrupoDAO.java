@@ -20,7 +20,7 @@ public class GrupoDAO {
         return grupoDAO.findAllByUserId(userId);
     }
 
-    public void addMember(int groupId, int userId, String role) {
-        grupoDAO.addMember(groupId, userId, role);
+    public boolean addMember(int groupId, int userId, String role) {
+        return grupoDAO.addMember(groupId, userId, role);
     }
 }

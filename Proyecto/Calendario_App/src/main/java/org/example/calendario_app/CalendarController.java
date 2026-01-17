@@ -204,6 +204,7 @@ public class CalendarController {
             // Pass DAOs for label creation within group dialog
             controller.setEtiquetaDAO(etiquetaDAO);
             controller.setGrupoDAO(grupoDAO);
+            controller.setUsuarioDAO(usuarioDAO);
 
             dialogStage.showAndWait();
 
@@ -232,15 +233,28 @@ public class CalendarController {
                             System.out.println("DEBUG: Members to add: " + members.size());
 
                             for (GroupDialogController.GroupMember member : members) {
-                                String cleanEmail = member.email != null ? member.email.trim() : "";
-                                System.out.println("DEBUG: Processing member email: " + cleanEmail);
-
-                                Usuario addedUser = usuarioDAO.findByEmail(cleanEmail);
-                                if (addedUser != null) {
-                                    System.out.println("DEBUG: Found user ID: " + addedUser.getId());
-                                    grupoDAO.addMember(groupId, addedUser.getId(), member.role.toLowerCase());
-                                } else {
-                                    System.out.println("DEBUG: User not found for email: " + cleanEmail);
+                                if (member.usuario != null) {
+                                    System.out.println("DEBUG: Adding member ID: " + member.usuario.getId());
+                                    // Map "usuario" to "user" to avoid database truncation (likely VARCHAR(5) or
+                                    // ENUM)
+                                    String role = member.role;
+//                                    if ("Usuario".equals(role)) {
+//                                        role = "Usuario";
+//                                    }
+                                    System.out.println(
+                                            "DEBUG: Role from Object: " + member.role + " -> Converted: " + role);
+                                    if (!grupoDAO.addMember(groupId, member.usuario.getId(), role)) {
+                                        System.out.println("DEBUG: Failed to add member with role '" + role
+                                                + "'. Trying 'user'...");
+                                        // Retry with "user"
+                                        if (!grupoDAO.addMember(groupId, member.usuario.getId(), "Usuario")) {
+                                            System.out.println("DEBUG: Failed with 'user'. Trying 'USER'...");
+                                            // Retry with "USER"
+                                            if (!grupoDAO.addMember(groupId, member.usuario.getId(), "Usuario")) {
+                                                System.err.println("ERROR: Failed to add member after all retries.");
+                                            }
+                                        }
+                                    }
                                 }
                             }
 

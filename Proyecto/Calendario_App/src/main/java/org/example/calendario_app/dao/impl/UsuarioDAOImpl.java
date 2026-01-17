@@ -4,6 +4,7 @@ import org.example.calendario_app.model.Usuario;
 import org.example.calendario_app.util.DatabaseConnection;
 
 import java.sql.*;
+import java.util.List;
 
 public class UsuarioDAOImpl {
     DatabaseConnection databaseConnection;
@@ -76,5 +77,25 @@ public class UsuarioDAOImpl {
             e.printStackTrace();
         }
         return usuario;
+    }
+
+    public List<Usuario> findAll() {
+        java.util.List<Usuario> usuarios = new java.util.ArrayList<>();
+        String query = "SELECT * FROM usuarios";
+        try (Connection conn = databaseConnection.getConn();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                usuarios.add(new Usuario(
+                        rs.getInt("id_usuario"),
+                        rs.getInt("id_cliente"),
+                        rs.getString("correo"),
+                        rs.getString("password_hash"),
+                        "USER"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return usuarios;
     }
 }

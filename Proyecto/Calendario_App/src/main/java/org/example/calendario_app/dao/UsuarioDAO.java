@@ -3,6 +3,8 @@ package org.example.calendario_app.dao;
 import org.example.calendario_app.dao.impl.UsuarioDAOImpl;
 import org.example.calendario_app.model.Usuario;
 
+import java.util.List;
+
 public class UsuarioDAO {
     UsuarioDAOImpl usuarioDAO;
 
@@ -26,5 +28,9 @@ public class UsuarioDAO {
 
     public Usuario findByEmail(String email) {
         return usuarioDAO.findByEmail(email);
+    }
+
+    public List<Usuario> findAll() {
+        return usuarioDAO.findAll();
     }
 }
