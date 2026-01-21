@@ -235,22 +235,26 @@ public class CalendarController {
                             for (GroupDialogController.GroupMember member : members) {
                                 if (member.usuario != null) {
                                     System.out.println("DEBUG: Adding member ID: " + member.usuario.getId());
-                                    // Map "usuario" to "user" to avoid database truncation (likely VARCHAR(5) or
-                                    // ENUM)
+
                                     String role = member.role;
-//                                    if ("Usuario".equals(role)) {
-//                                        role = "Usuario";
-//                                    }
+                                    // Normalize role for database (Usuario -> user, Admin -> admin)
+                                    if ("Usuario".equalsIgnoreCase(role)) {
+                                        role = "user";
+                                    } else if ("Admin".equalsIgnoreCase(role)) {
+                                        role = "admin";
+                                    }
+
                                     System.out.println(
                                             "DEBUG: Role from Object: " + member.role + " -> Converted: " + role);
+
                                     if (!grupoDAO.addMember(groupId, member.usuario.getId(), role)) {
                                         System.out.println("DEBUG: Failed to add member with role '" + role
                                                 + "'. Trying 'user'...");
-                                        // Retry with "user"
-                                        if (!grupoDAO.addMember(groupId, member.usuario.getId(), "Usuario")) {
+                                        // Retry with "user" as fallback
+                                        if (!grupoDAO.addMember(groupId, member.usuario.getId(), "user")) {
                                             System.out.println("DEBUG: Failed with 'user'. Trying 'USER'...");
-                                            // Retry with "USER"
-                                            if (!grupoDAO.addMember(groupId, member.usuario.getId(), "Usuario")) {
+                                            // Retry with "USER" as fallback
+                                            if (!grupoDAO.addMember(groupId, member.usuario.getId(), "USER")) {
                                                 System.err.println("ERROR: Failed to add member after all retries.");
                                             }
                                         }
