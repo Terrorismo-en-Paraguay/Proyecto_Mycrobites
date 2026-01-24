@@ -127,7 +127,6 @@ public class CalendarController {
         currentDate = LocalDate.now();
 
         if (Session.getInstance().getUsuario() != null) {
-            String name = Session.getInstance().getUsuario().getCorreo();
             if (Session.getInstance().getCliente() != null) {
                 String initName = Session.getInstance().getCliente().getNombre();
                 if (initName != null && !initName.isEmpty()) {
@@ -272,6 +271,12 @@ public class CalendarController {
                                 }
                             }
 
+                            // Link selected labels to the new group (New)
+                            List<Etiqueta> selectedLabels = controller.getSelectedLabels();
+                            for (Etiqueta label : selectedLabels) {
+                                etiquetaDAO.updateGroupId(label.getId(), groupId);
+                            }
+
                             addGroupCheckBox(newGroup);
                         }
                     }
@@ -318,7 +323,7 @@ public class CalendarController {
                         int userId = Session.getInstance().getUsuario().getId();
                         Integer groupId = (selectedGroup != null) ? selectedGroup.getId_grupo() : null;
 
-                        int labelId = etiquetaDAO.save(newLabel, userId, groupId);
+                        etiquetaDAO.save(newLabel, userId, groupId);
                         // If linking to group, maybe UI update is different?
                         // For now just reload labels or add to sidebar if sidebar shows personal
                         // labels.

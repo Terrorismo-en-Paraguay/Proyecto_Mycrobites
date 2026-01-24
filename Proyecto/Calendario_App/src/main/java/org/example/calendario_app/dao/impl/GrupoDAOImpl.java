@@ -18,81 +18,42 @@ public class GrupoDAOImpl {
         String insertGrupoQuery = "INSERT INTO grupos (nombre, descripcion) VALUES (?, ?)";
         String insertMemberQuery = "INSERT INTO grupos_usuarios (id_grupo, id_usuario, rol) VALUES (?, ?, ?)";
 
-        Connection conn = null;
-        PreparedStatement pstmtGroup = null;
-        PreparedStatement pstmtMember = null;
-        ResultSet generatedKeys = null;
+        try (Connection conn = databaseConnection.getConn()) {
+            conn.setAutoCommit(false);
 
-        try {
-            conn = databaseConnection.getConn();
-            conn.setAutoCommit(false); // Start Transaction
-
-            // 1. Insert Group
-            pstmtGroup = conn.prepareStatement(insertGrupoQuery, Statement.RETURN_GENERATED_KEYS);
-            pstmtGroup.setString(1, grupo.getNombre());
-            pstmtGroup.setString(2, grupo.getDescripcion());
-
-            int affectedRows = pstmtGroup.executeUpdate();
-            if (affectedRows == 0) {
-                conn.rollback();
-                return -1;
-            }
-
-            // 2. Get Group ID
             int groupId = -1;
-            generatedKeys = pstmtGroup.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                groupId = generatedKeys.getInt(1);
-            } else {
-                conn.rollback();
-                return -1;
+            try (PreparedStatement pstmtGroup = conn.prepareStatement(insertGrupoQuery,
+                    Statement.RETURN_GENERATED_KEYS)) {
+                pstmtGroup.setString(1, grupo.getNombre());
+                pstmtGroup.setString(2, grupo.getDescripcion());
+                pstmtGroup.executeUpdate();
+
+                try (ResultSet generatedKeys = pstmtGroup.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        groupId = generatedKeys.getInt(1);
+                    } else {
+                        conn.rollback();
+                        return -1;
+                    }
+                }
             }
+
             grupo.setId_grupo(groupId);
 
-            // 3. Insert Creator as ADMIN
-            pstmtMember = conn.prepareStatement(insertMemberQuery);
-            pstmtMember.setInt(1, groupId);
-            pstmtMember.setInt(2, idCreator);
-            pstmtMember.setString(3, "admin");
+            try (PreparedStatement pstmtMember = conn.prepareStatement(insertMemberQuery)) {
+                pstmtMember.setInt(1, groupId);
+                pstmtMember.setInt(2, idCreator);
+                pstmtMember.setString(3, "admin");
+                pstmtMember.executeUpdate();
+            }
 
-            pstmtMember.executeUpdate();
-
-            conn.commit(); // Commit Transaction
+            conn.commit();
             return groupId;
 
         } catch (SQLException e) {
             e.printStackTrace();
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
             return -1;
-        } finally {
-            try {
-                if (generatedKeys != null)
-                    generatedKeys.close();
-                if (pstmtGroup != null)
-                    pstmtGroup.close();
-                if (pstmtMember != null)
-                    pstmtMember.close();
-                if (conn != null)
-                    conn.setAutoCommit(true); // Reset auto-commit
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            // Do NOT close 'conn' if it's managed by DatabaseConnection and reused,
-            // but typical DAO patterns close connection or return it to pool.
-            // Assuming DatabaseConnection.getConn() returns a shared connection that
-            // shouldn't be closed here,
-            // OR a new connection. Standard practice with provided snippets suggests we
-            // just close the Statements.
-            // If DatabaseConnection creates a new connection each time, we should close it.
-            // Assuming we must close specific resources.
         }
-        // Assuming we must close specific resources.
     }
 
     public List<Grupo> findAllByUserId(int userId) {

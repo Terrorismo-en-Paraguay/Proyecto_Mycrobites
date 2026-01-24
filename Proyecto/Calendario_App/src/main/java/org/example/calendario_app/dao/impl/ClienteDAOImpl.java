@@ -38,17 +38,18 @@ public class ClienteDAOImpl {
     }
 
     public Cliente obtenerPorId(int id) {
-        String query = "SELECT * FROM clientes WHERE id_cliente = " + id;
+        String query = "SELECT * FROM clientes WHERE id_cliente = ?";
         Cliente cliente = null;
         try (Connection conn = databaseConnection.getConn();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
-            if (rs.next()) {
-                cliente = new Cliente(
-                        rs.getString("nombre"),
-                        rs.getString("apellidos"),
-                        null
-                );
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    cliente = new Cliente(
+                            rs.getString("nombre"),
+                            rs.getString("apellidos"),
+                            null);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

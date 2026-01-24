@@ -8,5 +8,7 @@ public interface EtiquetaDAO {
 
     int save(Etiqueta etiqueta, int idUsuario, Integer idGrupo);
 
+    void updateGroupId(int labelId, Integer groupId);
+
     void delete(int id);
 }

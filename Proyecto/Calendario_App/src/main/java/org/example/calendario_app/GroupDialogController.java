@@ -135,6 +135,10 @@ public class GroupDialogController {
         return members;
     }
 
+    public List<Etiqueta> getSelectedLabels() {
+        return selectedLabels;
+    }
+
     public void setEtiquetaDAO(EtiquetaDAO etiquetaDAO) {
         this.etiquetaDAO = etiquetaDAO;
     }

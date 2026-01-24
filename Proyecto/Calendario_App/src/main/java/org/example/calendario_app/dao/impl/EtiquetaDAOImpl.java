@@ -110,6 +110,23 @@ public class EtiquetaDAOImpl implements EtiquetaDAO {
     }
 
     @Override
+    public void updateGroupId(int labelId, Integer groupId) {
+        String query = "UPDATE etiquetas SET id_grupo = ? WHERE id_etiqueta = ?";
+        try (Connection conn = databaseConnection.getConn();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            if (groupId != null) {
+                pstmt.setInt(1, groupId);
+            } else {
+                pstmt.setNull(1, java.sql.Types.INTEGER);
+            }
+            pstmt.setInt(2, labelId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void delete(int id) {
         String query = "DELETE FROM etiquetas WHERE id_etiqueta = ?";
         try (Connection conn = databaseConnection.getConn();
