@@ -23,4 +23,8 @@ public class GrupoDAO {
     public boolean addMember(int groupId, int userId, String role) {
         return grupoDAO.addMember(groupId, userId, role);
     }
+
+    public List<Integer> findMembersByGroupId(int groupId) {
+        return grupoDAO.findMembersByGroupId(groupId);
+    }
 }

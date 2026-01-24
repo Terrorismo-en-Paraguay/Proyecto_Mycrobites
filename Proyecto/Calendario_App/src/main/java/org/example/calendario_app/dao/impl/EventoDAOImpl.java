@@ -25,37 +25,24 @@ public class EventoDAOImpl implements EventoDAO {
         // 3. Events that have a label which is shared with a group the user is in (via
         // etiquetas_grupos -> grupos_usuarios)
 
+        // Query to get:
+        // 1. Events created by the user
+        // 2. Events that have a label which is shared with the user (via
+        // etiquetas_usuarios)
+
         String query = """
-                    SELECT DISTINCT ev.*
-                    FROM events ev
-                    LEFT JOIN etiquetas e ON ev.id_etiqueta = e.id_etiqueta
-                    LEFT JOIN etiquetas_usuarios eu ON e.id_etiqueta = eu.id_etiqueta
-                    LEFT JOIN etiquetas_grupos eg ON e.id_etiqueta = eg.id_etiqueta
-                    LEFT JOIN grupos_usuarios gu ON eg.id_grupo = gu.id_grupo
-                    WHERE ev.id_creador = ?
-                       OR eu.id_usuario = ?
-                       OR gu.id_usuario = ?
-                """;
-
-        // Note: 'events' table name in original code was 'eventos'?
-        // Checking previous view_file of EventoDAOImpl...
-        // Original query was: "SELECT * FROM eventos WHERE id_creador = ?";
-        // So table name is 'eventos'.
-
-        String queryCorrected = """
                     SELECT DISTINCT ev.*
                     FROM eventos ev
                     LEFT JOIN etiquetas e ON ev.id_etiqueta = e.id_etiqueta
                     LEFT JOIN etiquetas_usuarios eu ON e.id_etiqueta = eu.id_etiqueta
-                    LEFT JOIN etiquetas_grupos eg ON e.id_etiqueta = eg.id_etiqueta
-                    LEFT JOIN grupos_usuarios gu ON eg.id_grupo = gu.id_grupo
+                    LEFT JOIN eventos_usuarios evu ON ev.id_evento = evu.id_evento
                     WHERE ev.id_creador = ?
                        OR eu.id_usuario = ?
-                       OR gu.id_usuario = ?
+                       OR evu.id_usuario = ?
                 """;
 
         try (Connection conn = databaseConnection.getConn();
-                PreparedStatement pstmt = conn.prepareStatement(queryCorrected)) {
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, idUsuario);
             pstmt.setInt(2, idUsuario);
@@ -112,6 +99,11 @@ public class EventoDAOImpl implements EventoDAO {
                     if (generatedKeys.next()) {
                         idGenerado = generatedKeys.getInt(1);
                         evento.setId(idGenerado);
+
+                        // Auto-sharing logic (New)
+                        if (evento.getId_etiqueta() != null) {
+                            shareWithGroupMembers(conn, idGenerado, evento.getId_etiqueta(), evento.getId_creador());
+                        }
                     }
                 }
             }
@@ -119,6 +111,42 @@ public class EventoDAOImpl implements EventoDAO {
             e.printStackTrace();
         }
         return idGenerado;
+    }
+
+    private void shareWithGroupMembers(Connection conn, int eventId, int labelId, int creatorId) throws SQLException {
+        // 1. Check if label is linked to a group
+        String checkGroupQuery = "SELECT id_grupo FROM etiquetas WHERE id_etiqueta = ?";
+        Integer groupId = null;
+        try (PreparedStatement pstmt = conn.prepareStatement(checkGroupQuery)) {
+            pstmt.setInt(1, labelId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    groupId = (Integer) rs.getObject("id_grupo");
+                }
+            }
+        }
+
+        // 2. If group exists, invite all members (except creator)
+        if (groupId != null) {
+            String membersQuery = "SELECT id_usuario FROM grupos_usuarios WHERE id_grupo = ? AND id_usuario != ?";
+            String inviteQuery = "INSERT INTO eventos_usuarios (id_evento, id_usuario, estado, notificado) VALUES (?, ?, 'pendiente', 0) ON DUPLICATE KEY UPDATE id_usuario=id_usuario";
+
+            try (PreparedStatement pstmtMembers = conn.prepareStatement(membersQuery);
+                    PreparedStatement pstmtInvite = conn.prepareStatement(inviteQuery)) {
+
+                pstmtMembers.setInt(1, groupId);
+                pstmtMembers.setInt(2, creatorId);
+
+                try (ResultSet rs = pstmtMembers.executeQuery()) {
+                    while (rs.next()) {
+                        int userId = rs.getInt("id_usuario");
+                        pstmtInvite.setInt(1, eventId);
+                        pstmtInvite.setInt(2, userId);
+                        pstmtInvite.executeUpdate();
+                    }
+                }
+            }
+        }
     }
 
     @Override

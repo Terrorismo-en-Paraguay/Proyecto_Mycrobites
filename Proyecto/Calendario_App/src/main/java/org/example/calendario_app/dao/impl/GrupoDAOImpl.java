@@ -134,4 +134,21 @@ public class GrupoDAOImpl {
             return false;
         }
     }
+
+    public List<Integer> findMembersByGroupId(int groupId) {
+        List<Integer> memberIds = new ArrayList<>();
+        String query = "SELECT id_usuario FROM grupos_usuarios WHERE id_grupo = ?";
+        try (Connection conn = databaseConnection.getConn();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, groupId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    memberIds.add(rs.getInt("id_usuario"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return memberIds;
+    }
 }

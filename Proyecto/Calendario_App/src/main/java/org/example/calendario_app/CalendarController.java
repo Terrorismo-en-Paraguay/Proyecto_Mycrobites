@@ -13,7 +13,6 @@ import javafx.scene.Cursor;
 import javafx.geometry.Side;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.Priority;
-import javafx.scene.shape.Line;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -39,7 +38,7 @@ import org.example.calendario_app.dao.GrupoDAO;
 import org.example.calendario_app.dao.impl.GrupoDAOImpl;
 import org.example.calendario_app.dao.UsuarioDAO;
 import org.example.calendario_app.dao.impl.UsuarioDAOImpl;
-import org.example.calendario_app.model.Usuario;
+// import org.example.calendario_app.model.Usuario; // Unused
 import org.example.calendario_app.util.Session;
 
 public class CalendarController {
@@ -166,12 +165,20 @@ public class CalendarController {
         btnCreateGroup.setOnAction(e -> openCreateGroupDialog());
     }
 
+    private final java.util.Map<Integer, List<Integer>> groupToMemberIds = new java.util.HashMap<>();
+
     private void loadUserGroups() {
         if (Session.getInstance().getUsuario() != null) {
             int userId = Session.getInstance().getUsuario().getId();
             List<Grupo> userGroups = grupoDAO.findAllByUserId(userId);
             sharedCalendarsContainer.getChildren().clear(); // Clear existing
+            groupToMemberIds.clear();
+
             for (Grupo group : userGroups) {
+                // Load members for this group
+                List<Integer> memberIds = grupoDAO.findMembersByGroupId(group.getId_grupo());
+                groupToMemberIds.put(group.getId_grupo(), memberIds);
+
                 addGroupCheckBox(group);
             }
         }
@@ -180,8 +187,11 @@ public class CalendarController {
     private void addGroupCheckBox(Grupo group) {
         CheckBox newGroup = new CheckBox(group.getNombre());
         newGroup.setSelected(true);
-        newGroup.getStyleClass().add("calendar-check-orange"); // Ensure this class exists or default color logic
+        newGroup.getStyleClass().add("calendar-check-blue"); // Ensure this class exists or default color logic
         newGroup.setUserData(group.getId_grupo());
+
+        newGroup.setOnAction(e -> drawCalendar());
+
         sharedCalendarsContainer.getChildren().add(newGroup);
     }
 
@@ -515,7 +525,7 @@ public class CalendarController {
 
                 // Add User Created Events
 
-                // 1. Collect visible label IDs
+                // 1. Collect visible label IDs from Personal Calendars
                 List<Integer> visibleLabelIds = new ArrayList<>();
                 for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
                     if (node instanceof CheckBox) {
@@ -526,18 +536,100 @@ public class CalendarController {
                     }
                 }
 
+                // 2. Collect visible creator IDs from Shared Groups
+                List<Integer> visibleCreatorIds = new ArrayList<>();
+                for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
+                    if (node instanceof CheckBox) {
+                        CheckBox cb = (CheckBox) node;
+                        if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                            int groupId = (Integer) cb.getUserData();
+                            List<Integer> members = groupToMemberIds.get(groupId);
+                            if (members != null) {
+                                visibleCreatorIds.addAll(members);
+                            }
+                        }
+                    }
+                }
+
                 for (Evento event : events) {
                     // Check if event should be visible
-                    // If event has no label, show it (default behavior, or maybe hide?)
-                    // If event has label, check if label ID is in visible list
-                    boolean isVisible = true;
+                    // 1. If it has a label, is that label checked? (Personal events mostly)
+                    // 2. OR is the creator in the visibleCreatorIds list? (Shared events)
+
+                    boolean isVisible = false;
+
+                    // Condition 1: Label Check
                     if (event.getId_etiqueta() != null) {
-                        if (!visibleLabelIds.contains(event.getId_etiqueta())) {
-                            isVisible = false;
+                        if (visibleLabelIds.contains(event.getId_etiqueta())) {
+                            isVisible = true;
+                        }
+                    } else if (visibleLabelIds.isEmpty() && visibleCreatorIds.isEmpty()) {
+                        // If everything hidden, hide. If no specific label and no label filters active?
+                        // Usually events with no label show up if created by user?
+                        // Let's assume default events (no label) for current user are always shown
+                        // unless we specifically filter them out?
+                        // For now, let's stick to explicit visibility:
+                        // If my Personal "No Label" was a checkbox, we'd check it.
+                        // Assuming current user events are covered by "My Calendars" logic usually.
+                        // But wait, "My Calendars" are LABELS. What about events with no label?
+                        // If event.id_creator == current_user, we might show it?
+                    }
+
+                    // Condition 2: Shared Group Check
+                    // If not yet visible, check if creator is in a shared group
+                    if (!isVisible) {
+                        if (visibleCreatorIds.contains(event.getId_creador())) {
+                            isVisible = true;
                         }
                     }
 
-                    if (isVisible && event.getFecha().equals(dateIterator)) {
+                    // Special case for current user events with no label?
+                    // Ensure they are visible if... well, we don't have a "No Label" checkbox.
+                    // Let's assume if it wasn't caught by Label Filter, and it's mine, it might be
+                    // visible?
+                    // Or if it matches Creator ID (which is me, and I am in my groups usually).
+                    // Use simpler logic:
+
+                    // If event has label -> must match visibleLabelIds
+                    // If event matches visibleCreatorIds -> visible
+
+                    // Refined Logic:
+                    boolean visibleContext = false;
+                    int currentUserId = Session.getInstance().getUsuario().getId();
+
+                    if (event.getId_creador() == currentUserId) {
+                        if (event.getId_etiqueta() == null) {
+                            visibleContext = true;
+                        } else if (visibleLabelIds.contains(event.getId_etiqueta())) {
+                            visibleContext = true;
+                        }
+                    } else {
+                        if (visibleCreatorIds.contains(event.getId_creador())) {
+                            // If the event has a label, only hide it if the label is in our sidebar AND
+                            // unchecked.
+                            // If the label is NOT in our sidebar, we can't filter it, so show it.
+                            boolean labelVisible = true;
+                            if (event.getId_etiqueta() != null) {
+                                boolean userHasThisLabel = false;
+                                for (Etiqueta l : labels) {
+                                    if (l.getId() == event.getId_etiqueta()) {
+                                        userHasThisLabel = true;
+                                        break;
+                                    }
+                                }
+
+                                if (userHasThisLabel && !visibleLabelIds.contains(event.getId_etiqueta())) {
+                                    labelVisible = false;
+                                }
+                            }
+
+                            if (labelVisible) {
+                                visibleContext = true;
+                            }
+                        }
+                    }
+
+                    if (visibleContext && event.getFecha().equals(dateIterator)) {
                         addEventLabel(cell, event);
                     }
                 }
@@ -625,15 +717,70 @@ public class CalendarController {
         }
 
         // 4. Place Events
-        // Filter events for today
-        List<Evento> todaysEvents = new ArrayList<>();
-        for (Evento event : events) {
-            if (event.getFecha().equals(currentDate)) {
-                todaysEvents.add(event);
+        // 1. Collect visible label IDs from Personal Calendars
+        List<Integer> visibleLabelIds = new ArrayList<>();
+        for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox cb = (CheckBox) node;
+                if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                    visibleLabelIds.add((Integer) cb.getUserData());
+                }
             }
         }
 
-        for (Evento event : todaysEvents) {
+        // 2. Collect visible creator IDs from Shared Groups
+        List<Integer> visibleCreatorIds = new ArrayList<>();
+        for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox cb = (CheckBox) node;
+                if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                    int groupId = (Integer) cb.getUserData();
+                    List<Integer> members = groupToMemberIds.get(groupId);
+                    if (members != null) {
+                        visibleCreatorIds.addAll(members);
+                    }
+                }
+            }
+        }
+
+        for (Evento event : events) {
+            if (!event.getFecha().equals(currentDate))
+                continue;
+
+            boolean visibleContext = false;
+            int currentUserId = Session.getInstance().getUsuario().getId();
+
+            if (event.getId_creador() == currentUserId) {
+                if (event.getId_etiqueta() == null) {
+                    visibleContext = true;
+                } else if (visibleLabelIds.contains(event.getId_etiqueta())) {
+                    visibleContext = true;
+                }
+            } else {
+                // Shared Event
+                if (visibleCreatorIds.contains(event.getId_creador())) {
+                    boolean labelVisible = true;
+                    if (event.getId_etiqueta() != null) {
+                        boolean userHasThisLabel = false;
+                        for (Etiqueta l : labels) {
+                            if (l.getId() == event.getId_etiqueta()) {
+                                userHasThisLabel = true;
+                                break;
+                            }
+                        }
+                        if (userHasThisLabel && !visibleLabelIds.contains(event.getId_etiqueta())) {
+                            labelVisible = false;
+                        }
+                    }
+                    if (labelVisible) {
+                        visibleContext = true;
+                    }
+                }
+            }
+
+            if (!visibleContext)
+                continue;
+
             int startHour = event.getFecha_inicio().getHour();
             int endHour = event.getFecha_fin().getHour();
 
@@ -726,6 +873,7 @@ public class CalendarController {
 
         // Add Events
         List<Integer> visibleLabelIds = new ArrayList<>();
+        // Personal
         for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
             if (node instanceof CheckBox) {
                 CheckBox cb = (CheckBox) node;
@@ -734,16 +882,53 @@ public class CalendarController {
                 }
             }
         }
+        // Shared
+        List<Integer> visibleCreatorIds = new ArrayList<>();
+        for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox cb = (CheckBox) node;
+                if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                    int groupId = (Integer) cb.getUserData();
+                    List<Integer> members = groupToMemberIds.get(groupId);
+                    if (members != null) {
+                        visibleCreatorIds.addAll(members);
+                    }
+                }
+            }
+        }
 
         for (Evento event : events) {
-            boolean isVisible = true;
-            if (event.getId_etiqueta() != null) {
-                if (!visibleLabelIds.contains(event.getId_etiqueta())) {
-                    isVisible = false;
+            boolean visibleContext = false;
+            int currentUserId = Session.getInstance().getUsuario().getId();
+
+            if (event.getId_creador() == currentUserId) {
+                if (event.getId_etiqueta() == null) {
+                    visibleContext = true;
+                } else if (visibleLabelIds.contains(event.getId_etiqueta())) {
+                    visibleContext = true;
+                }
+            } else {
+                if (visibleCreatorIds.contains(event.getId_creador())) {
+                    boolean labelVisible = true;
+                    if (event.getId_etiqueta() != null) {
+                        boolean userHasThisLabel = false;
+                        for (Etiqueta l : labels) {
+                            if (l.getId() == event.getId_etiqueta()) {
+                                userHasThisLabel = true;
+                                break;
+                            }
+                        }
+                        if (userHasThisLabel && !visibleLabelIds.contains(event.getId_etiqueta())) {
+                            labelVisible = false;
+                        }
+                    }
+                    if (labelVisible) {
+                        visibleContext = true;
+                    }
                 }
             }
 
-            if (isVisible && event.getFecha().equals(date)) {
+            if (visibleContext && event.getFecha().equals(date)) {
                 addEventLabel(cell, event);
             }
         }
@@ -861,14 +1046,12 @@ public class CalendarController {
         userIconContainer.setCursor(Cursor.HAND);
 
         ContextMenu contextMenu = new ContextMenu();
-        contextMenu.setStyle("-fx-background-color: -fx-bg-darker;");
+        contextMenu.getStyleClass().add("custom-context-menu");
 
         MenuItem userItem = new MenuItem("Usuario: " + userName);
         userItem.setDisable(true);
-        userItem.setStyle("-fx-font-weight: bold; -fx-text-fill: white;");
 
         MenuItem logoutItem = new MenuItem("Cerrar sesión");
-        logoutItem.setStyle("-fx-text-fill: white;");
         logoutItem.setOnAction(e -> logout());
 
         contextMenu.getItems().addAll(userItem, logoutItem);

@@ -4,6 +4,7 @@ public class Etiqueta {
     private int id_etiqueta;
     private String nombre;
     private String color;
+    private Integer id_grupo;
 
     public Etiqueta() {
     }
@@ -12,6 +13,13 @@ public class Etiqueta {
         this.id_etiqueta = id_etiqueta;
         this.nombre = nombre;
         this.color = color;
+    }
+
+    public Etiqueta(int id_etiqueta, String nombre, String color, Integer id_grupo) {
+        this.id_etiqueta = id_etiqueta;
+        this.nombre = nombre;
+        this.color = color;
+        this.id_grupo = id_grupo;
     }
 
     public Etiqueta(String nombre, String color) {
@@ -41,5 +49,13 @@ public class Etiqueta {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Integer getId_grupo() {
+        return id_grupo;
+    }
+
+    public void setId_grupo(Integer id_grupo) {
+        this.id_grupo = id_grupo;
     }
 }

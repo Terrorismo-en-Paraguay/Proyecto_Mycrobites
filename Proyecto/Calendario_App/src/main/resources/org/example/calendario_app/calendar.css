@@ -150,6 +150,8 @@
     border-radius: 2px;
 }
 
+
+
 /* Buttons and Navigation */
 .header-bar {
     -fx-background-color: -fx-bg-dark;
@@ -306,6 +308,30 @@
 
 .calendar-check-red:selected {
     -fx-text-fill: #E74C3C;
+}
+
+/* Blue */
+.calendar-check-blue .box {
+    -fx-background-color: #000000;
+    -fx-border-color: #555;
+    -fx-border-radius: 3;
+}
+
+.calendar-check-blue:selected .box {
+    -fx-background-color: #3498DB;
+    -fx-border-color: transparent;
+}
+
+.calendar-check-blue:selected .mark {
+    -fx-background-color: white;
+}
+
+.calendar-check-blue {
+    -fx-text-fill: #B0B0B0;
+}
+
+.calendar-check-blue:selected {
+    -fx-text-fill: #3498DB;
 }
 
 .sidebar {
