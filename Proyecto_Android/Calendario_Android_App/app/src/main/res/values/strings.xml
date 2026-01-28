@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Calendario_Android_App</string>
+    <!-- Login Fragment Strings -->
+    <string name="login_title">Accede a tu cuenta</string>
+    <string name="label_email">Correo electrónico</string>
+    <string name="label_password">Contraseña</string>
+    <string name="hint_enter_email">tu@email.com</string>
+    <string name="hint_enter_password">Introduce tu contraseña</string>
+    <string name="forgot_password">¿Olvidó su contraseña?</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="continue_google">Continuar con Google</string>
+    <string name="no_account">¿No tienes cuenta? </string>
+    <string name="register_text">Regístrate</string>
+    
+    <!-- Register Fragment Strings -->
+    <string name="register_title">Regístrate</string>
+    <string name="label_name">Nombre</string>
+    <string name="hint_enter_name">Introduce tu nombre</string>
+    <string name="label_surname">Apellido</string>
+    <string name="hint_enter_surname">Introduce tu apellido</string>
+    <string name="label_confirm_password">Confirmar Contraseña</string>
+    <string name="register_button">Registrar cuenta</string>
+    <string name="option_create_calendar">Crear Calendario</string>
+
+    <!-- App Messages -->
+    <string name="error_fill_all_fields">Por favor complete todos los campos</string>
+    <string name="welcome_message">Bienvenido %1$s</string>
+    <string name="login_clicked">Login Clicked</string>
+    <string name="google_clicked">Continue with Google Clicked</string>
+    <string name="forgot_password_clicked">Forgot Password Clicked</string>
+    <string name="error_credentials">Credenciales incorrectas o error de conexión</string>
+    <string name="error_email_exists">El correo electrónico ya está registrado</string>
+    <string name="error_create_client">Error al crear el cliente</string>
+    <string name="error_create_user">Error al crear el usuario</string>
+
+    <!-- Create Group Strings -->
+    <string name="back">Atrás</string>
+    <string name="create_group_title">Crear Nuevo Grupo</string>
+    <string name="create_group_subtitle">Ingresa la información básica para comenzar.</string>
+    <string name="group_info_section">INFORMACIÓN DEL GRUPO</string>
+    <string name="label_group_name">NOMBRE DEL GRUPO</string>
+    <string name="hint_group_name">Ej. Equipo de Marketing</string>
+    <string name="label_group_desc">DESCRIPCIÓN</string>
+    <string name="hint_group_desc">Define el propósito de este grupo...</string>
+    <string name="group_footer_info">El nombre y la descripción ayudan a identificar el propósito del grupo y facilitan que otros usuarios lo encuentren.</string>
+    <string name="btn_next">Siguiente</string>
+    
+    <!-- Step 3 Strings -->
+    <string name="step3_subtitle">Paso 3 de 3: Gestión de Miembros</string>
+    <string name="add_members_section">AÑADIR PERSONAS</string>
+    <string name="label_member_email">EMAIL DEL INVITADO</string>
+    <string name="hint_member_email">correo@ejemplo.com</string>
+    <string name="label_role">ROL</string>
+    <string name="btn_add_member">Añadir</string>
+    <string name="current_members_section">MIEMBROS ACTUALES (%1$d)</string>
+    <string name="btn_create_group">Crear Grupo</string>
+    <string name="role_member">Miembro</string>
+    <string name="role_editor">Editor</string>
+    <string name="role_admin">Admin</string>
+    <string name="error_invalid_email">Email inválido</string>
+    <string name="error_user_not_found">Usuario no encontrado</string>
+    <string name="error_member_already_added">Este miembro ya ha sido añadido</string>
+    <string name="group_created_success">Grupo creado exitosamente</string>
+</resources>
