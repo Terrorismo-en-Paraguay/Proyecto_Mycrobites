@@ -957,6 +957,12 @@ public class CalendarController {
             controller.setEvento(event);
 
             dialogStage.showAndWait();
+
+            if (controller.isDeleted()) {
+                events.remove(event);
+                drawCalendar();
+                drawMiniCalendar();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
