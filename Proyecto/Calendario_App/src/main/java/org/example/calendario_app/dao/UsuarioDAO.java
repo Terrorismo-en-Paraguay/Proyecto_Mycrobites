@@ -14,15 +14,20 @@ public class UsuarioDAO {
 
     public Usuario iniciarSesion(String email, String password) {
         Usuario usuario = usuarioDAO.iniciarSesion(email);
-        if (usuario != null && usuario.getPassword_hash().equals(password)) {
-            return usuario;
-        } else {
-            System.out.println("Usuario no encontrado o contraseña incorrecta");
-            return null;
+        if (usuario != null) {
+            String hashedInput = org.example.calendario_app.util.PasswordUtil.hash(password);
+            if (usuario.getPassword_hash().equals(hashedInput)) {
+                return usuario;
+            }
         }
+        System.out.println("Usuario no encontrado o contraseña incorrecta");
+        return null;
     }
 
     public int registrar(Usuario usuario) {
+        // Hash the password before saving
+        String hashedPassword = org.example.calendario_app.util.PasswordUtil.hash(usuario.getPassword_hash());
+        usuario.setPassword_hash(hashedPassword);
         return usuarioDAO.registrar(usuario);
     }
 
