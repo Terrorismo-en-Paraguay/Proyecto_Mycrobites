@@ -13,7 +13,6 @@ import javafx.scene.Cursor;
 import javafx.geometry.Side;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.Priority;
-
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -1076,6 +1075,9 @@ public class CalendarController {
         // Limpiar sesión
         Session.getInstance().setUsuario(null);
         Session.getInstance().setCliente(null);
+
+        // Limpiar credenciales guardadas
+        org.example.calendario_app.util.PrefsManager.clear();
 
         // Volver a login
         try {

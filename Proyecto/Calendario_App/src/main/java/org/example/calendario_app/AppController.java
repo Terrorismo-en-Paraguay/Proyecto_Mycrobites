@@ -165,6 +165,9 @@ public class AppController {
                 Session.getInstance().setUsuario(usuario);
                 Session.getInstance().setCliente(cliente);
 
+                // Guardar credenciales para incio de sesion automatico
+                org.example.calendario_app.util.PrefsManager.saveCreds(email, password);
+
                 loadCalendar();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error de inicio de sesión", "Correo o contraseña incorrectos.");
