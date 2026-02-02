@@ -4,6 +4,7 @@ module org.example.calendario_app {
     requires transitive javafx.graphics;
     requires java.sql;
     requires java.prefs;
+    requires jakarta.mail;
     requires static lombok;
 
     opens org.example.calendario_app to javafx.fxml;
