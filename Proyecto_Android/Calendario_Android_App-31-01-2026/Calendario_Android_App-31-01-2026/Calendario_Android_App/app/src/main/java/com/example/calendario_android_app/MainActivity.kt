@@ -167,7 +167,9 @@ class MainActivity : AppCompatActivity() {
 
         // Footer Actions
         findViewById<View>(R.id.btn_settings)?.setOnClickListener {
-            Toast.makeText(this, "Configuración: Próximamente", Toast.LENGTH_SHORT).show()
+            // Navigate to Settings
+            val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
+            navHostFragment?.navController?.navigate(R.id.action_global_settingsFragment)
             drawerLayout.closeDrawer(GravityCompat.START)
         }
 

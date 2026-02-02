@@ -11,19 +11,19 @@ import java.security.NoSuchAlgorithmException
 object HashUtils {
 
     /**
-     * Genera un hash de la contraseña utilizando el algoritmo SHA-1 y lo codifica en Base64.
+     * Genera un hash de la contraseña utilizando el algoritmo SHA-256 y lo codifica en Base64.
      * 
      * @param password La contraseña en texto plano que se desea hashear.
      * @return Una cadena de texto (String) que representa la contraseña hasheada y codificada.
      * 
      * Funcionamiento:
-     * 1. Se obtiene una instancia del algoritmo SHA-1.
+     * 1. Se obtiene una instancia del algoritmo SHA-256.
      * 2. Se convierte la contraseña a bytes y se procesa.
      * 3. El resultado del hash (bytes) se convierte a una cadena Base64 legible para guardarla en la BD.
      */
     fun hashPassword(password: String): String {
         return try {
-            val md = MessageDigest.getInstance("SHA-1")
+            val md = MessageDigest.getInstance("SHA-256")
             md.update(password.toByteArray())
             val resume = md.digest()
 

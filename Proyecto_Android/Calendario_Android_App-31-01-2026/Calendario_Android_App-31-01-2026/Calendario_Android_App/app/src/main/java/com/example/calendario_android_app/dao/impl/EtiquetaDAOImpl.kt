@@ -209,7 +209,7 @@ class EtiquetaDAOImpl : EtiquetaDAO {
      * Obtiene el ID del grupo asociado a una etiqueta específica.
      * @return ID del grupo o null si es una etiqueta personal.
      */
-    override suspend fun getGrupoIdByEtiqueta(idEtiqueta: Int): Int? = withWithContext(Dispatchers.IO) {
+    override suspend fun getGrupoIdByEtiqueta(idEtiqueta: Int): Int? = withContext(Dispatchers.IO) {
         var idGrupo: Int? = null
         val connection = DatabaseConnection.getConnection()
         try {

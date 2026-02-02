@@ -6,7 +6,7 @@ import com.example.calendario_android_app.util.DatabaseConnection
 import com.example.calendario_android_app.util.HashUtils
 import java.sql.SQLException
 
-class UsuarioDAOImpl : UsuarioDAO {
+
 /**
  * Implementación de la interfaz UsuarioDAO para gestionar el acceso a datos de usuarios.
  * Se comunica con la base de datos MySQL para tareas de autenticación y gestión de perfiles.
@@ -20,35 +20,29 @@ class UsuarioDAOImpl : UsuarioDAO {
      * @return Objeto Usuario si las credenciales son válidas, null en caso contrario.
      */
     override fun loguearUsuario(correo: String, contrasena: String): Usuario? {
-        val connection = DatabaseConnection.getConnection() ?: return null
+        val connection = DatabaseConnection.getConnection() ?: throw SQLException("No se pudo conectar a la base de datos")
         
-        var usuario: Usuario? = null
-        try {
-            // Buscamos al usuario por correo y el hash de la contraseña proporcionada.
+        return connection.use { conn ->
             val query = "SELECT * FROM usuarios WHERE correo = ? AND password_hash = ?"
-            val statement = connection.prepareStatement(query)
-            statement.setString(1, correo)
-            statement.setString(2, HashUtils.hashPassword(contrasena))
-            
-            val resultSet = statement.executeQuery()
-            
-            if (resultSet.next()) {
-                usuario = Usuario(
-                    id_usuario = resultSet.getInt("id_usuario"),
-                    id_cliente = resultSet.getString("id_cliente"),
-                    correo = resultSet.getString("correo"),
-                    password_hash = resultSet.getString("password_hash"),
-                    rol = resultSet.getString("rol")
-                )
+            conn.prepareStatement(query).use { statement ->
+                statement.setString(1, correo)
+                statement.setString(2, HashUtils.hashPassword(contrasena))
+                
+                statement.executeQuery().use { resultSet ->
+                    if (resultSet.next()) {
+                        Usuario(
+                            id_usuario = resultSet.getInt("id_usuario"),
+                            id_cliente = resultSet.getString("id_cliente"),
+                            correo = resultSet.getString("correo"),
+                            password_hash = resultSet.getString("password_hash"),
+                            rol = resultSet.getString("rol")
+                        )
+                    } else {
+                        null
+                    }
+                }
             }
-            resultSet.close()
-            statement.close()
-            connection.close()
-        } catch (e: SQLException) {
-            android.util.Log.e("UsuarioDAOImpl", "Error de SQL en login", e)
-            e.printStackTrace()
         }
-        return usuario
     }
 
     /**
@@ -246,3 +240,6 @@ class UsuarioDAOImpl : UsuarioDAO {
         updated
     }
 }
+
+
+

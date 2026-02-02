@@ -175,22 +175,8 @@ class ChangePasswordDialogFragment : DialogFragment() {
     companion object {
         const val TAG = "ChangePasswordDialog"
     }
+
+
 }
 
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    companion object {
-        const val TAG = "ChangePasswordDialog"
-    }
-}
