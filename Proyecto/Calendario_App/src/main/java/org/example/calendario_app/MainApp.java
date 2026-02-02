@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class ºMainApp extends Application {
+public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         String savedEmail = org.example.calendario_app.util.PrefsManager.getEmail();
@@ -31,8 +31,7 @@ public class ºMainApp extends Application {
                 Scene scene = new Scene(fxmlLoader.load(), 1280, 800);
                 stage.setScene(scene);
 
-                // Obtener pantalla actual para maximizar correctamente si es necesario o
-                // centrar
+                // Obtener pantalla actual para maximizar correctamente si es necesario o centrar
                 javafx.collections.ObservableList<javafx.stage.Screen> screens = javafx.stage.Screen
                         .getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
                 if (!screens.isEmpty()) {

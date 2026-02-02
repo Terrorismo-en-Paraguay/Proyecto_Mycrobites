@@ -240,6 +240,12 @@ public class CalendarController {
                             List<GroupDialogController.GroupMember> members = controller.getMembers();
                             System.out.println("DEBUG: Members to add: " + members.size());
 
+                            // Get current user name for the email
+                            String currentUserName = "Un usuario";
+                            if (Session.getInstance().getCliente() != null) {
+                                currentUserName = Session.getInstance().getCliente().getNombre();
+                            }
+
                             for (GroupDialogController.GroupMember member : members) {
                                 if (member.usuario != null) {
                                     System.out.println("DEBUG: Adding member ID: " + member.usuario.getId());
@@ -255,6 +261,7 @@ public class CalendarController {
                                     System.out.println(
                                             "DEBUG: Role from Object: " + member.role + " -> Converted: " + role);
 
+                                    boolean added = false;
                                     if (!grupoDAO.addMember(groupId, member.usuario.getId(), role)) {
                                         System.out.println("DEBUG: Failed to add member with role '" + role
                                                 + "'. Trying 'miembro'...");
@@ -262,10 +269,26 @@ public class CalendarController {
                                         if (!grupoDAO.addMember(groupId, member.usuario.getId(), "miembro")) {
                                             System.out.println("DEBUG: Failed with 'miembro'. Trying 'user'...");
                                             // Last resort retry with "user" just in case
-                                            if (!grupoDAO.addMember(groupId, member.usuario.getId(), "user")) {
+                                            if (grupoDAO.addMember(groupId, member.usuario.getId(), "user")) {
+                                                added = true;
+                                            } else {
                                                 System.err.println("ERROR: Failed to add member after all retries.");
                                             }
+                                        } else {
+                                            added = true;
                                         }
+                                    } else {
+                                        added = true;
+                                    }
+
+                                    if (added) {
+                                        // Send Email Invitation
+                                        String recipientEmail = member.usuario.getCorreo();
+                                        // Use the exact role string shown in UI or the database one? Let's use the UI
+                                        // one for friendliness or the converted one.
+                                        // The template uses $role.
+                                        Mail.sendGroupInvitation(recipientEmail, "Usuario", currentUserName, groupName,
+                                                member.role);
                                     }
                                 }
                             }

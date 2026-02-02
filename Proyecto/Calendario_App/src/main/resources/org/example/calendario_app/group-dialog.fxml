@@ -53,7 +53,7 @@
     <VBox spacing="10.0">
         <Label styleClass="input-label" text="Añadir Personas" />
         <HBox spacing="10.0" alignment="CENTER_LEFT">
-            <ComboBox fx:id="userComboBox" promptText="Seleccionar usuario..." HBox.hgrow="ALWAYS" prefWidth="300.0" styleClass="combo-box" />
+            <TextField fx:id="userEmailField" promptText="Escribe el correo del usuario..." HBox.hgrow="ALWAYS" prefWidth="300.0" styleClass="dialog-input" />
             <ComboBox fx:id="roleComboBox" promptText="Rol" prefWidth="120.0" styleClass="combo-box"/>
             <Button text="+ Añadir" onAction="#handleAddMember" style="-fx-background-color: #A066F5; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
         </HBox>

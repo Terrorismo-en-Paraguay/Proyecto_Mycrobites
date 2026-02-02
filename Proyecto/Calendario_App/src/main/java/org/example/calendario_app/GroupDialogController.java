@@ -32,7 +32,7 @@ public class GroupDialogController {
     private FlowPane selectedLabelsContainer;
 
     @FXML
-    private ComboBox<org.example.calendario_app.model.Usuario> userComboBox;
+    private TextField userEmailField;
     @FXML
     private ComboBox<String> roleComboBox;
     @FXML
@@ -69,21 +69,6 @@ public class GroupDialogController {
     public void initialize() {
         roleComboBox.getItems().addAll("Admin", "Usuario");
         roleComboBox.getSelectionModel().select("Usuario");
-
-        userComboBox.setCellFactory(lv -> new ListCell<org.example.calendario_app.model.Usuario>() {
-            @Override
-            protected void updateItem(org.example.calendario_app.model.Usuario item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty ? null : item.getCorreo());
-            }
-        });
-        userComboBox.setButtonCell(new ListCell<org.example.calendario_app.model.Usuario>() {
-            @Override
-            protected void updateItem(org.example.calendario_app.model.Usuario item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty ? null : item.getCorreo());
-            }
-        });
 
         labelComboBox.setCellFactory(lv -> new ListCell<Etiqueta>() {
             @Override
@@ -149,19 +134,31 @@ public class GroupDialogController {
 
     public void setUsuarioDAO(org.example.calendario_app.dao.UsuarioDAO usuarioDAO) {
         this.usuarioDAO = usuarioDAO;
-        if (usuarioDAO != null) {
-            userComboBox.getItems().setAll(usuarioDAO.findAll());
-        }
     }
 
     // Additional getters if needed for description, members, labels etc.
 
     @FXML
     private void handleAddMember() {
-        org.example.calendario_app.model.Usuario selectedUser = userComboBox.getValue();
+        String emailInput = userEmailField.getText();
         String role = roleComboBox.getValue();
 
-        if (selectedUser != null && role != null) {
+        if (emailInput == null || emailInput.trim().isEmpty()) {
+            return;
+        }
+
+        if (role != null && usuarioDAO != null) {
+            org.example.calendario_app.model.Usuario selectedUser = usuarioDAO.findByEmail(emailInput.trim());
+
+            if (selectedUser == null) {
+                // User not found
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Usuario no encontrado");
+                alert.setContentText("No existe un usuario con el correo: " + emailInput);
+                alert.showAndWait();
+                return;
+            }
+
             String email = selectedUser.getCorreo();
 
             // Check if already added
@@ -194,7 +191,7 @@ public class GroupDialogController {
             row.getChildren().addAll(info, removeBtn);
             membersContainer.getChildren().add(row);
 
-            userComboBox.getSelectionModel().clearSelection();
+            userEmailField.clear();
         }
     }
 
@@ -203,9 +200,8 @@ public class GroupDialogController {
         chip.setStyle(
                 "-fx-background-color: #383B42; -fx-background-radius: 15; -fx-padding: 3 10; -fx-alignment: center; -fx-border-color: #555; -fx-border-radius: 15;");
 
-        // Add color dot
         Label dot = new Label("●");
-        // Simple mapping, normally we'd parse the color class
+
         String colorStyle = "-fx-text-fill: white;";
         if (etiqueta.getColor() != null) {
             if (etiqueta.getColor().contains("red"))
@@ -302,17 +298,21 @@ public class GroupDialogController {
         }
 
         // UX Improvement: Check if there is a pending user selected
-        org.example.calendario_app.model.Usuario pendingUser = userComboBox.getValue();
-        if (pendingUser != null) {
+        // UX Improvement: Check if there is a pending user selected
+        String pendingEmail = userEmailField.getText();
+        if (pendingEmail != null && !pendingEmail.trim().isEmpty() && usuarioDAO != null) {
             // Validate role
             String role = roleComboBox.getValue();
             if (role != null) {
-                // Determine if this email is already in the list
-                boolean alreadyAdded = members.stream()
-                        .anyMatch(m -> m.usuario.getCorreo().equals(pendingUser.getCorreo()));
-                if (!alreadyAdded) {
-                    // Auto-add the member
-                    members.add(new GroupMember(pendingUser, role));
+                org.example.calendario_app.model.Usuario pendingUser = usuarioDAO.findByEmail(pendingEmail.trim());
+                if (pendingUser != null) {
+                    // Determine if this email is already in the list
+                    boolean alreadyAdded = members.stream()
+                            .anyMatch(m -> m.usuario.getCorreo().equals(pendingUser.getCorreo()));
+                    if (!alreadyAdded) {
+                        // Auto-add the member
+                        members.add(new GroupMember(pendingUser, role));
+                    }
                 }
             }
         }
