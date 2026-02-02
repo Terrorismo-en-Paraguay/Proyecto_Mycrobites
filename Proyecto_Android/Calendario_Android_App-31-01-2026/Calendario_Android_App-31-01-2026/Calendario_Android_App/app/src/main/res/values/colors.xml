@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Primary colors -->
+    <color name="primary_100">#892CDC</color>
+    <color name="primary_200">#BC6FF1</color>
+    <color name="primary_300">#fdf6fd</color>
+    
+    <!-- Accent colors -->
+    <color name="accent_100">#D9ACF5</color>
+    <color name="accent_200">#fff4ff</color>
+    
+    <!-- Text colors -->
+    <color name="text_100">#EEEEEE</color>
+    <color name="text_200">#FDEBED</color>
+    
+    <!-- Background colors -->
+    <color name="bg_100">#222831</color>
+    <color name="bg_200">#393E46</color>
+    <color name="bg_300">#454e59</color>
+    
+    <!-- Legacy/Semantic mappings for existing usage -->
+    <color name="background_dark">@color/bg_100</color>
+    <color name="primary_purple">@color/primary_100</color>
+    <color name="text_hint">#80FFFFFF</color>
+    <color name="input_background">@color/bg_200</color>
+    <color name="google_button_background">@color/bg_200</color>
+    <color name="divider_color">#40FFFFFF</color>
+    <color name="card_background">@color/bg_200</color>
+    <color name="text_secondary">@color/text_100</color>
+    
+    <!-- Event colors (using new palette) -->
+    <color name="event_green">#1F4D42</color>
+    <color name="event_green_text">#4CD964</color>
+    <color name="event_purple">@color/primary_100</color>
+    <color name="event_purple_text">@color/primary_200</color>
+    
+    <!-- Calendar colors (using new palette) -->
+    <color name="calendar_day_selected">@color/primary_200</color>
+    <color name="calendar_dot_green">#00E676</color>
+    <color name="calendar_dot_purple">@color/primary_100</color>
+    <color name="calendar_dot_orange">#FFAB40</color>
+    <color name="calendar_dot_red">#FF5252</color>
+    <color name="image_placeholder">@color/bg_300</color>
+    <color name="surface">@color/bg_200</color>
+</resources>

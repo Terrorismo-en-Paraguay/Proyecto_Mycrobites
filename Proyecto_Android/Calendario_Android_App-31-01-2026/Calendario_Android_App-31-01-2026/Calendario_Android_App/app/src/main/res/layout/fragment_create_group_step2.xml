@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_100"
+    android:padding="16dp">
+
+    <!-- Header / Toolbar area -->
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_chevron_left"
+        app:tint="@color/primary_100"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/tv_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/back"
+        android:textColor="@color/primary_100"
+        android:textSize="16sp"
+        android:layout_marginStart="4dp"
+        app:layout_constraintStart_toEndOf="@+id/btn_back"
+        app:layout_constraintTop_toTopOf="@+id/btn_back"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back" />
+
+    <!-- Progress Indicator -->
+    <LinearLayout
+        android:id="@+id/layout_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="@+id/btn_back"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <View
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:background="@drawable/bg_circle_selected"
+            android:backgroundTint="#33FFFFFF"
+            android:layout_marginEnd="4dp"/>
+        <View
+            android:layout_width="24dp"
+            android:layout_height="4dp"
+            android:background="@drawable/bg_btn_outlined"
+            android:backgroundTint="@color/primary_100"
+            android:layout_marginEnd="4dp"/>
+        <View
+            android:layout_width="4dp"
+            android:layout_height="4dp"
+            android:background="@drawable/bg_circle_selected"
+            android:backgroundTint="#33FFFFFF"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/create_group_title"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_back" />
+
+    <TextView
+        android:id="@+id/tv_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Paso 2: Categorización del grupo"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+
+    <!-- Form container -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:cardBackgroundColor="@color/bg_200"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_subtitle">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
+                
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_label"
+                    app:tint="@color/primary_100"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ETIQUETAS"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.1"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SELECCIONAR EXISTENTE"
+                android:textColor="@color/text_secondary"
+                android:textSize="10sp"
+                android:textAllCaps="true"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Select Existing Label (Clickable Box instead of Spinner) -->
+            <LinearLayout
+                android:id="@+id/layout_select_labels"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_input_field"
+                android:paddingHorizontal="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/tv_select_labels_hint"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Seleccionar etiquetas..."
+                    android:textColor="#888"
+                    android:textSize="16sp"/>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_arrow_drop_down"
+                    app:tint="#888"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="o"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"/>
+
+             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_add_new_label"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="+ Nueva Etiqueta"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:textColor="@color/primary_100"
+                app:strokeColor="@color/primary_100"
+                app:cornerRadius="12dp"
+                android:layout_marginBottom="32dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ETIQUETAS SELECCIONADAS"
+                android:textColor="@color/text_secondary"
+                android:textSize="10sp"
+                android:textAllCaps="true"
+                android:layout_marginBottom="12dp"/>
+            
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_labels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:chipSpacing="8dp"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/icon_info"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_help"
+        app:tint="@color/text_secondary"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/card_form" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Las etiquetas ayudan a filtrar los eventos del calendario y organizar mejor las tareas del grupo."
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/icon_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/icon_info" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_next"
+        android:backgroundTint="@color/primary_100"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:paddingVertical="12dp"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_chevron_right"
+        app:iconGravity="textEnd"
+        app:iconTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

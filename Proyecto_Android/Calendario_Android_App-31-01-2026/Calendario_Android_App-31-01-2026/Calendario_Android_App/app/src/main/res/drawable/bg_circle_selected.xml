@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer white border -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent"/>
+            <stroke android:width="3dp" android:color="@color/white"/>
+            <size android:width="48dp" android:height="48dp"/>
+        </shape>
+    </item>
+    <!-- Inner color circle (will be tinted programmatically or via another layer if static) -->
+    <!-- Actually, better to just use a ring or modify the view properties programmatically (scale/border).
+         But user asked for "resalta", usually a border is good.
+         Let's keep the original bg_color_circle and Apply a StateListDrawable or handle selection in code by adding a border view or changing background.
+         
+         Easier approach for runtime dynamic colors:
+         The views in layout are just View with backgroundTint.
+         To highlight, we can add a white border or scale it up.
+         Since they are simple Views, adding a border might require a ShapeDrawable with stroke.
+         But the background is already a shape.
+         
+         Let's create a "selected" drawable that is valid for any color? No, color is dynamic.
+         
+         Strategy:
+         In code, when selected:
+         - Deselect others: set background back to `bg_color_circle` (no stroke)
+         - Select current: set background to a new drawable `bg_color_circle_selected`? 
+           But we need to keep the TINT.
+           
+           If we change background drawable, the `backgroundTint` might persist or need re-application.
+           
+           Alternative: Use a parent FrameLayout for each color and toggle a white border View visibility.
+           This touches XML structure.
+           
+           Alternative 2: Scale up the selected view.
+           
+           Alternative 3: Change the background drawable to one with a stroke.
+           Let's try creating `bg_color_circle_selected.xml` which has a stroke.
+    -->
+    <item android:top="4dp" android:left="4dp" android:right="4dp" android:bottom="4dp">
+         <shape android:shape="oval">
+            <solid android:color="#FFFFFF"/> <!-- This will be tinted by backgroundTint -->
+            <size android:width="40dp" android:height="40dp"/>
+        </shape>
+    </item>
+</layer-list>
