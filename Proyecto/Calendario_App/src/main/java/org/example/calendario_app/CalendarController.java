@@ -1084,10 +1084,13 @@ public class CalendarController {
         MenuItem userItem = new MenuItem("Usuario: " + userName);
         userItem.setDisable(true);
 
+        MenuItem changePasswordItem = new MenuItem("Cambiar contraseña");
+        changePasswordItem.setOnAction(e -> openChangePasswordDialog());
+
         MenuItem logoutItem = new MenuItem("Cerrar sesión");
         logoutItem.setOnAction(e -> logout());
 
-        contextMenu.getItems().addAll(userItem, logoutItem);
+        contextMenu.getItems().addAll(userItem, changePasswordItem, logoutItem);
 
         userIconContainer.setOnMouseClicked(e -> {
             contextMenu.show(userIconContainer, Side.BOTTOM, 0, 0);
@@ -1110,6 +1113,57 @@ public class CalendarController {
             stage.setScene(scene);
             stage.setMaximized(true);
             stage.centerOnScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openChangePasswordDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("change-password-dialog.fxml"));
+            VBox page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Cambiar Contraseña");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(userIconContainer.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            ChangePasswordDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                String newPassword = controller.getNewPassword();
+                if (newPassword != null && !newPassword.isEmpty()) {
+                    if (Session.getInstance().getUsuario() != null) {
+                        int userId = Session.getInstance().getUsuario().getId();
+                        boolean success = usuarioDAO.updatePassword(userId, newPassword);
+
+                        Alert alert;
+                        if (success) {
+                            alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Éxito");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Contraseña actualizada correctamente.");
+
+                            // Update saved credentials if auto-login is used
+                            if (org.example.calendario_app.util.PrefsManager.getEmail() != null) {
+                                org.example.calendario_app.util.PrefsManager.saveCreds(
+                                        Session.getInstance().getUsuario().getCorreo(), newPassword);
+                            }
+                        } else {
+                            alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText(null);
+                            alert.setContentText("No se pudo actualizar la contraseña en la base de datos.");
+                        }
+                        alert.showAndWait();
+                    }
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

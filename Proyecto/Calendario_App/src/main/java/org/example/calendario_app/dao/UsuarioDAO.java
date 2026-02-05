@@ -38,4 +38,9 @@ public class UsuarioDAO {
     public List<Usuario> findAll() {
         return usuarioDAO.findAll();
     }
+
+    public boolean updatePassword(int userId, String newPassword) {
+        String hashedPassword = org.example.calendario_app.util.PasswordUtil.hash(newPassword);
+        return usuarioDAO.updatePassword(userId, hashedPassword);
+    }
 }

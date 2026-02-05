@@ -100,4 +100,18 @@ public class UsuarioDAOImpl {
         }
         return usuarios;
     }
+
+    public boolean updatePassword(int userId, String newPasswordHash) {
+        String query = "UPDATE usuarios SET password_hash = ? WHERE id_usuario = ?";
+        try (Connection conn = databaseConnection.getConn();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, newPasswordHash);
+            pstmt.setInt(2, userId);
+            int rowsUpdated = pstmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
