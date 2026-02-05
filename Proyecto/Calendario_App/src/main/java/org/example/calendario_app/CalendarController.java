@@ -299,6 +299,9 @@ public class CalendarController {
                                 etiquetaDAO.updateGroupId(label.getId(), groupId);
                             }
 
+                            // Refresh labels to update their group ID in memory
+                            loadLabels();
+
                             addGroupCheckBox(newGroup);
                         }
                     }
@@ -552,29 +555,52 @@ public class CalendarController {
 
                 // Add User Created Events
 
-                // 1. Collect visible label IDs from Personal Calendars
+                // 1. Collect active group IDs
+                List<Integer> activeGroupIds = new ArrayList<>();
+                for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
+                    if (node instanceof CheckBox) {
+                        CheckBox cb = (CheckBox) node;
+                        if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                            activeGroupIds.add((Integer) cb.getUserData());
+                        }
+                    }
+                }
+                System.out.println("[DEBUG] Active Group IDs: " + activeGroupIds);
+
+                // 2. Collect visible label IDs (filtering out those from inactive groups)
                 List<Integer> visibleLabelIds = new ArrayList<>();
                 for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
                     if (node instanceof CheckBox) {
                         CheckBox cb = (CheckBox) node;
                         if (cb.isSelected() && cb.getUserData() instanceof Integer) {
-                            visibleLabelIds.add((Integer) cb.getUserData());
+                            int labelId = (Integer) cb.getUserData();
+                            // Find label object
+                            Etiqueta labelObj = null;
+                            for (Etiqueta l : labels) {
+                                if (l.getId() == labelId) {
+                                    labelObj = l;
+                                    break;
+                                }
+                            }
+
+                            if (labelObj != null && labelObj.getId_grupo() != null) {
+                                // Group label: only add if group is active
+                                if (activeGroupIds.contains(labelObj.getId_grupo())) {
+                                    visibleLabelIds.add(labelId);
+                                }
+                            } else {
+                                visibleLabelIds.add(labelId);
+                            }
                         }
                     }
                 }
 
-                // 2. Collect visible creator IDs from Shared Groups
+                // 3. Collect visible creator IDs from Shared Groups
                 List<Integer> visibleCreatorIds = new ArrayList<>();
-                for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
-                    if (node instanceof CheckBox) {
-                        CheckBox cb = (CheckBox) node;
-                        if (cb.isSelected() && cb.getUserData() instanceof Integer) {
-                            int groupId = (Integer) cb.getUserData();
-                            List<Integer> members = groupToMemberIds.get(groupId);
-                            if (members != null) {
-                                visibleCreatorIds.addAll(members);
-                            }
-                        }
+                for (Integer groupId : activeGroupIds) {
+                    List<Integer> members = groupToMemberIds.get(groupId);
+                    if (members != null) {
+                        visibleCreatorIds.addAll(members);
                     }
                 }
 
@@ -744,29 +770,51 @@ public class CalendarController {
         }
 
         // 4. Place Events
-        // 1. Collect visible label IDs from Personal Calendars
+        // 1. Collect active group IDs
+        List<Integer> activeGroupIds = new ArrayList<>();
+        for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox cb = (CheckBox) node;
+                if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                    activeGroupIds.add((Integer) cb.getUserData());
+                }
+            }
+        }
+
+        // 2. Collect visible label IDs (filtering out those from inactive groups)
         List<Integer> visibleLabelIds = new ArrayList<>();
         for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
             if (node instanceof CheckBox) {
                 CheckBox cb = (CheckBox) node;
                 if (cb.isSelected() && cb.getUserData() instanceof Integer) {
-                    visibleLabelIds.add((Integer) cb.getUserData());
+                    int labelId = (Integer) cb.getUserData();
+                    // Find label object
+                    Etiqueta labelObj = null;
+                    for (Etiqueta l : labels) {
+                        if (l.getId() == labelId) {
+                            labelObj = l;
+                            break;
+                        }
+                    }
+
+                    if (labelObj != null && labelObj.getId_grupo() != null) {
+                        // Group label: only add if group is active
+                        if (activeGroupIds.contains(labelObj.getId_grupo())) {
+                            visibleLabelIds.add(labelId);
+                        }
+                    } else {
+                        visibleLabelIds.add(labelId);
+                    }
                 }
             }
         }
 
-        // 2. Collect visible creator IDs from Shared Groups
+        // 3. Collect visible creator IDs from Shared Groups
         List<Integer> visibleCreatorIds = new ArrayList<>();
-        for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
-            if (node instanceof CheckBox) {
-                CheckBox cb = (CheckBox) node;
-                if (cb.isSelected() && cb.getUserData() instanceof Integer) {
-                    int groupId = (Integer) cb.getUserData();
-                    List<Integer> members = groupToMemberIds.get(groupId);
-                    if (members != null) {
-                        visibleCreatorIds.addAll(members);
-                    }
-                }
+        for (Integer groupId : activeGroupIds) {
+            List<Integer> members = groupToMemberIds.get(groupId);
+            if (members != null) {
+                visibleCreatorIds.addAll(members);
             }
         }
 
@@ -899,28 +947,51 @@ public class CalendarController {
         }
 
         // Add Events
-        List<Integer> visibleLabelIds = new ArrayList<>();
-        // Personal
-        for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
-            if (node instanceof CheckBox) {
-                CheckBox cb = (CheckBox) node;
-                if (cb.isSelected() && cb.getUserData() instanceof Integer) {
-                    visibleLabelIds.add((Integer) cb.getUserData());
-                }
-            }
-        }
-        // Shared
-        List<Integer> visibleCreatorIds = new ArrayList<>();
+        // 1. Collect active group IDs
+        List<Integer> activeGroupIds = new ArrayList<>();
         for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
             if (node instanceof CheckBox) {
                 CheckBox cb = (CheckBox) node;
                 if (cb.isSelected() && cb.getUserData() instanceof Integer) {
-                    int groupId = (Integer) cb.getUserData();
-                    List<Integer> members = groupToMemberIds.get(groupId);
-                    if (members != null) {
-                        visibleCreatorIds.addAll(members);
+                    activeGroupIds.add((Integer) cb.getUserData());
+                }
+            }
+        }
+
+        // 2. Collect visible label IDs (filtering out those from inactive groups)
+        List<Integer> visibleLabelIds = new ArrayList<>();
+        for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox cb = (CheckBox) node;
+                if (cb.isSelected() && cb.getUserData() instanceof Integer) {
+                    int labelId = (Integer) cb.getUserData();
+                    // Find label object
+                    Etiqueta labelObj = null;
+                    for (Etiqueta l : labels) {
+                        if (l.getId() == labelId) {
+                            labelObj = l;
+                            break;
+                        }
+                    }
+
+                    if (labelObj != null && labelObj.getId_grupo() != null) {
+                        // Group label: only add if group is active
+                        if (activeGroupIds.contains(labelObj.getId_grupo())) {
+                            visibleLabelIds.add(labelId);
+                        }
+                    } else {
+                        visibleLabelIds.add(labelId);
                     }
                 }
+            }
+        }
+
+        // 3. Collect visible creator IDs from Shared Groups
+        List<Integer> visibleCreatorIds = new ArrayList<>();
+        for (Integer groupId : activeGroupIds) {
+            List<Integer> members = groupToMemberIds.get(groupId);
+            if (members != null) {
+                visibleCreatorIds.addAll(members);
             }
         }
 
