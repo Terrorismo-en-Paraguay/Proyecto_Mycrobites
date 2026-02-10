@@ -168,6 +168,14 @@ public class AppController {
                 // Guardar credenciales para incio de sesion automatico
                 org.example.calendario_app.util.PrefsManager.saveCreds(email, password);
 
+                // Send Login Notification
+                // Run in a separate thread to avoid freezing UI? Mail.java seems synchronous
+                // but network ops should be async.
+                // For now, keeping it simple as per previous pattern.
+                new Thread(() -> {
+                    Mail.sendLoginNotification(email, cliente.getNombre());
+                }).start();
+
                 loadCalendar();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error de inicio de sesión", "Correo o contraseña incorrectos.");
@@ -205,6 +213,12 @@ public class AppController {
 
                         showAlert(Alert.AlertType.INFORMATION, "Registro Exitoso",
                                 "Usuario registrado correctamente. Ahora puede iniciar sesión.");
+
+                        // Send Welcome Email
+                        new Thread(() -> {
+                            Mail.sendRegistrationWelcome(email, name);
+                        }).start();
+
                         onToggleLogin();
                     } else {
                         showAlert(Alert.AlertType.ERROR, "Error de Registro", "No se pudo crear el usuario.");

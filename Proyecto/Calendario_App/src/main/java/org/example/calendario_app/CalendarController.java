@@ -1213,6 +1213,16 @@ public class CalendarController {
                         int userId = Session.getInstance().getUsuario().getId();
                         boolean success = usuarioDAO.updatePassword(userId, newPassword);
 
+                        if (success) {
+                            // Send Email Notification
+                            String email = Session.getInstance().getUsuario().getCorreo();
+                            String name = "Usuario";
+                            if (Session.getInstance().getCliente() != null) {
+                                name = Session.getInstance().getCliente().getNombre();
+                            }
+                            Mail.sendPasswordChangeNotification(email, name);
+                        }
+
                         Alert alert;
                         if (success) {
                             alert = new Alert(Alert.AlertType.INFORMATION);
