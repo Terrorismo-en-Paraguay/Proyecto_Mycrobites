@@ -101,6 +101,9 @@ public class EventoDAOImpl implements EventoDAO {
                         evento.setId(idGenerado);
 
                         // Auto-sharing logic (New)
+                        // Add creator to event_users with 'pendiente' status
+                        addEventUserRelation(conn, idGenerado, evento.getId_creador(), "pendiente");
+
                         if (evento.getId_etiqueta() != null) {
                             shareWithGroupMembers(conn, idGenerado, evento.getId_etiqueta(), evento.getId_creador());
                         }
@@ -158,6 +161,16 @@ public class EventoDAOImpl implements EventoDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void addEventUserRelation(Connection conn, int eventId, int userId, String status) throws SQLException {
+        String query = "INSERT INTO eventos_usuarios (id_evento, id_usuario, estado, notificado) VALUES (?, ?, ?, 0)";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, eventId);
+            pstmt.setInt(2, userId);
+            pstmt.setString(3, status);
+            pstmt.executeUpdate();
         }
     }
 }
