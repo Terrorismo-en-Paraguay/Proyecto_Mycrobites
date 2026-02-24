@@ -100,7 +100,7 @@ public class CalendarController {
     @FXML
     private VBox sharedCalendarsContainer;
 
-    // private YearMonth currentYearMonth; // Replaced by currentDate
+
     private final List<Evento> events = new ArrayList<>();
     private final List<Etiqueta> labels = new ArrayList<>();
     private EventoDAO eventoDAO;
@@ -119,7 +119,7 @@ public class CalendarController {
         festivoDAO = new FestivoDAOImpl();
 
         loadEvents();
-        loadUserGroups(); // New method
+        loadUserGroups();
         loadLabels();
         loadHolidays();
 
@@ -173,7 +173,7 @@ public class CalendarController {
             groupToMemberIds.clear();
 
             for (Grupo group : userGroups) {
-                // Load members for this group
+
                 List<Integer> memberIds = grupoDAO.findMembersByGroupId(group.getId_grupo());
                 groupToMemberIds.put(group.getId_grupo(), memberIds);
 
@@ -185,7 +185,7 @@ public class CalendarController {
     private void addGroupCheckBox(Grupo group) {
         CheckBox newGroup = new CheckBox(group.getNombre());
         newGroup.setSelected(true);
-        newGroup.getStyleClass().add("calendar-check-blue"); // Ensure this class exists or default color logic
+        newGroup.getStyleClass().add("calendar-check-blue");
         newGroup.setUserData(group.getId_grupo());
 
         newGroup.setOnAction(e -> drawCalendar());
@@ -207,9 +207,9 @@ public class CalendarController {
 
             GroupDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setAvailableLabels(labels); // Pass existing labels
+            controller.setAvailableLabels(labels);
 
-            // Pass DAOs for label creation within group dialog
+
             controller.setEtiquetaDAO(etiquetaDAO);
             controller.setGrupoDAO(grupoDAO);
             controller.setUsuarioDAO(usuarioDAO);
@@ -218,11 +218,7 @@ public class CalendarController {
 
             if (controller.isSaveClicked()) {
                 String groupName = controller.getGroupName();
-                // Get description if available from controller, or default
-                // For now assuming we just have name in this block, but controller has
-                // descriptionArea
-                // casting controller to access fields if getters missing or update controller
-                // Actually GroupDialogController needs getGroupDescription()
+
 
                 if (groupName != null && !groupName.isEmpty()) {
                     if (Session.getInstance().getUsuario() != null) {
@@ -236,11 +232,10 @@ public class CalendarController {
                         if (groupId != -1) {
                             newGroup.setId_grupo(groupId);
 
-                            // Add invited members
                             List<GroupDialogController.GroupMember> members = controller.getMembers();
                             System.out.println("DEBUG: Members to add: " + members.size());
 
-                            // Get current user name for the email
+
                             String currentUserName = "Un usuario";
                             if (Session.getInstance().getCliente() != null) {
                                 currentUserName = Session.getInstance().getCliente().getNombre();
@@ -251,7 +246,6 @@ public class CalendarController {
                                     System.out.println("DEBUG: Adding member ID: " + member.usuario.getId());
 
                                     String role = member.role;
-                                    // Normalize role for database (Usuario -> miembro, Admin -> admin)
                                     if ("Usuario".equalsIgnoreCase(role)) {
                                         role = "miembro";
                                     } else if ("Admin".equalsIgnoreCase(role)) {
@@ -265,10 +259,10 @@ public class CalendarController {
                                     if (!grupoDAO.addMember(groupId, member.usuario.getId(), role)) {
                                         System.out.println("DEBUG: Failed to add member with role '" + role
                                                 + "'. Trying 'miembro'...");
-                                        // Retry with "miembro" as fallback
+
                                         if (!grupoDAO.addMember(groupId, member.usuario.getId(), "miembro")) {
                                             System.out.println("DEBUG: Failed with 'miembro'. Trying 'user'...");
-                                            // Last resort retry with "user" just in case
+
                                             if (grupoDAO.addMember(groupId, member.usuario.getId(), "user")) {
                                                 added = true;
                                             } else {
@@ -282,24 +276,21 @@ public class CalendarController {
                                     }
 
                                     if (added) {
-                                        // Send Email Invitation
+
                                         String recipientEmail = member.usuario.getCorreo();
-                                        // Use the exact role string shown in UI or the database one? Let's use the UI
-                                        // one for friendliness or the converted one.
-                                        // The template uses $role.
+
                                         Mail.sendGroupInvitation(recipientEmail, "Usuario", currentUserName, groupName,
                                                 member.role);
                                     }
                                 }
                             }
 
-                            // Link selected labels to the new group (New)
                             List<Etiqueta> selectedLabels = controller.getSelectedLabels();
                             for (Etiqueta label : selectedLabels) {
                                 etiquetaDAO.updateGroupId(label.getId(), groupId);
                             }
 
-                            // Refresh labels to update their group ID in memory
+
                             loadLabels();
 
                             addGroupCheckBox(newGroup);
@@ -327,7 +318,7 @@ public class CalendarController {
             LabelDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
 
-            // Pass available groups
+
             if (Session.getInstance().getUsuario() != null) {
                 int userId = Session.getInstance().getUsuario().getId();
                 List<Grupo> userGroups = grupoDAO.findAllByUserId(userId);
@@ -349,12 +340,7 @@ public class CalendarController {
                         Integer groupId = (selectedGroup != null) ? selectedGroup.getId_grupo() : null;
 
                         etiquetaDAO.save(newLabel, userId, groupId);
-                        // If linking to group, maybe UI update is different?
-                        // For now just reload labels or add to sidebar if sidebar shows personal
-                        // labels.
-                        // Currently 'loadLabels()' adds to sidebar.
-                        // If it's a group label, should it appear in sidebar?
-                        // Assuming yes for now, re-load or add.
+
                         loadLabels();
                     }
                 }
@@ -367,18 +353,16 @@ public class CalendarController {
     private void addCalendarLabelUI(Etiqueta etiqueta) {
         CheckBox newCalendar = new CheckBox(etiqueta.getNombre());
         newCalendar.setSelected(true);
-        // Handle both short codes ("purple") and legacy full classes
-        // ("calendar-check-purple")
+
         String color = etiqueta.getColor();
         if (color != null && !color.startsWith("calendar-check-")) {
             color = "calendar-check-" + color;
         }
         newCalendar.getStyleClass().add(color);
 
-        // Store Label ID in user data for filtering
         newCalendar.setUserData(etiqueta.getId());
 
-        // Redraw calendar when checkbox toggled
+
         newCalendar.setOnAction(e -> drawCalendar());
 
         myCalendarsContainer.getChildren().add(newCalendar);
@@ -433,7 +417,7 @@ public class CalendarController {
                     newEvento.setId_creador(Session.getInstance().getUsuario().getId());
                     if (eventoDAO.save(newEvento) > 0) {
                         events.add(newEvento);
-                        drawCalendar(); // Refresh to show new event
+                        drawCalendar();
                     }
                 }
             }
@@ -462,11 +446,10 @@ public class CalendarController {
     }
 
     private void drawCalendar() {
-        // Clear grid entirely (headers will be re-added or kept depending on view)
-        // Simplest strategy: Clear all children and redraw headers + content per view
+
         calendarGrid.getChildren().clear();
 
-        // Update Header Label based on view
+
         DateTimeFormatter formatter;
         String formattedDate;
 
@@ -480,7 +463,7 @@ public class CalendarController {
             case WEEK -> {
                 DateTimeFormatter weekFormatter = DateTimeFormatter.ofPattern("MMM yyyy",
                         Locale.forLanguageTag("es-ES"));
-                // Show range? or just Month of start date
+
                 formattedDate = currentDate.format(weekFormatter);
                 monthYearLabel.setText(
                         "Semana del " + currentDate.format(DateTimeFormatter.ofPattern("d")) + " - " + formattedDate);
@@ -508,28 +491,22 @@ public class CalendarController {
     private void drawMonthView() {
         drawWeekHeader();
 
-        // Update Header Label - Already done in drawCalendar switch
-        // Just draw the grid
 
-        // Calculate days
         LocalDate firstOfMonth = YearMonth.from(currentDate).atDay(1);
-        // ... rest of logic ...
-        DayOfWeek firstDayOfWeek = firstOfMonth.getDayOfWeek();
-        int dayOfWeekValue = firstDayOfWeek.getValue(); // Monday = 1, Sunday = 7
 
-        // We want Monday as start, so offset is dayOfWeekValue - 1
-        // Example: If 1st is Monday (1), offset is 0. If Tuesday (2), offset is 1.
+        DayOfWeek firstDayOfWeek = firstOfMonth.getDayOfWeek();
+        int dayOfWeekValue = firstDayOfWeek.getValue();
         int offset = dayOfWeekValue - 1;
 
         LocalDate dateIterator = firstOfMonth.minusDays(offset);
 
-        // Draw 5 or 6 rows (mostly 6 covers all cases)
+
         for (int row = 1; row <= 6; row++) {
             for (int col = 0; col < 7; col++) {
                 VBox cell = new VBox();
                 cell.setSpacing(2);
 
-                // Style
+
                 boolean isCurrentMonth = dateIterator.getMonth().equals(currentDate.getMonth());
                 if (isCurrentMonth) {
                     cell.getStyleClass().add("day-cell");
@@ -537,7 +514,7 @@ public class CalendarController {
                     cell.getStyleClass().add("day-cell-dimmed");
                 }
 
-                // Day Label
+
                 Label dayLabel = new Label(String.valueOf(dateIterator.getDayOfMonth()));
                 dayLabel.getStyleClass().add("day-label");
                 if (dateIterator.equals(LocalDate.now())) {
@@ -545,7 +522,7 @@ public class CalendarController {
                 }
                 cell.getChildren().add(dayLabel);
 
-                // Add Holidays
+
                 for (Festivo festivo : holidays) {
                     if (festivo.getDia() == dateIterator.getDayOfMonth()
                             && festivo.getMes() == dateIterator.getMonthValue()) {
@@ -553,9 +530,7 @@ public class CalendarController {
                     }
                 }
 
-                // Add User Created Events
 
-                // 1. Collect active group IDs
                 List<Integer> activeGroupIds = new ArrayList<>();
                 for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
                     if (node instanceof CheckBox) {
@@ -567,14 +542,14 @@ public class CalendarController {
                 }
                 System.out.println("[DEBUG] Active Group IDs: " + activeGroupIds);
 
-                // 2. Collect visible label IDs (filtering out those from inactive groups)
+
                 List<Integer> visibleLabelIds = new ArrayList<>();
                 for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
                     if (node instanceof CheckBox) {
                         CheckBox cb = (CheckBox) node;
                         if (cb.isSelected() && cb.getUserData() instanceof Integer) {
                             int labelId = (Integer) cb.getUserData();
-                            // Find label object
+
                             Etiqueta labelObj = null;
                             for (Etiqueta l : labels) {
                                 if (l.getId() == labelId) {
@@ -584,7 +559,7 @@ public class CalendarController {
                             }
 
                             if (labelObj != null && labelObj.getId_grupo() != null) {
-                                // Group label: only add if group is active
+
                                 if (activeGroupIds.contains(labelObj.getId_grupo())) {
                                     visibleLabelIds.add(labelId);
                                 }
@@ -595,7 +570,7 @@ public class CalendarController {
                     }
                 }
 
-                // 3. Collect visible creator IDs from Shared Groups
+
                 List<Integer> visibleCreatorIds = new ArrayList<>();
                 for (Integer groupId : activeGroupIds) {
                     List<Integer> members = groupToMemberIds.get(groupId);
@@ -605,48 +580,26 @@ public class CalendarController {
                 }
 
                 for (Evento event : events) {
-                    // Check if event should be visible
-                    // 1. If it has a label, is that label checked? (Personal events mostly)
-                    // 2. OR is the creator in the visibleCreatorIds list? (Shared events)
+
 
                     boolean isVisible = false;
 
-                    // Condition 1: Label Check
+
                     if (event.getId_etiqueta() != null) {
                         if (visibleLabelIds.contains(event.getId_etiqueta())) {
                             isVisible = true;
                         }
                     } else if (visibleLabelIds.isEmpty() && visibleCreatorIds.isEmpty()) {
-                        // If everything hidden, hide. If no specific label and no label filters active?
-                        // Usually events with no label show up if created by user?
-                        // Let's assume default events (no label) for current user are always shown
-                        // unless we specifically filter them out?
-                        // For now, let's stick to explicit visibility:
-                        // If my Personal "No Label" was a checkbox, we'd check it.
-                        // Assuming current user events are covered by "My Calendars" logic usually.
-                        // But wait, "My Calendars" are LABELS. What about events with no label?
-                        // If event.id_creator == current_user, we might show it?
+
                     }
 
-                    // Condition 2: Shared Group Check
-                    // If not yet visible, check if creator is in a shared group
+
                     if (!isVisible) {
                         if (visibleCreatorIds.contains(event.getId_creador())) {
                             isVisible = true;
                         }
                     }
 
-                    // Special case for current user events with no label?
-                    // Ensure they are visible if... well, we don't have a "No Label" checkbox.
-                    // Let's assume if it wasn't caught by Label Filter, and it's mine, it might be
-                    // visible?
-                    // Or if it matches Creator ID (which is me, and I am in my groups usually).
-                    // Use simpler logic:
-
-                    // If event has label -> must match visibleLabelIds
-                    // If event matches visibleCreatorIds -> visible
-
-                    // Refined Logic:
                     boolean visibleContext = false;
                     int currentUserId = Session.getInstance().getUsuario().getId();
 
@@ -658,9 +611,6 @@ public class CalendarController {
                         }
                     } else {
                         if (visibleCreatorIds.contains(event.getId_creador())) {
-                            // If the event has a label, only hide it if the label is in our sidebar AND
-                            // unchecked.
-                            // If the label is NOT in our sidebar, we can't filter it, so show it.
                             boolean labelVisible = true;
                             if (event.getId_etiqueta() != null) {
                                 boolean userHasThisLabel = false;
@@ -687,10 +637,6 @@ public class CalendarController {
                     }
                 }
 
-                // Simulate Events (Only for current month for simplicity, or random)
-                // if (isCurrentMonth && random.nextDouble() < 0.2) {
-                // addRandomEvent(cell);
-                // }
 
                 calendarGrid.add(cell, col, row);
 
@@ -702,14 +648,12 @@ public class CalendarController {
     private void drawWeekView() {
         drawWeekHeader();
 
-        // Find start of week (Monday)
         LocalDate startOfWeek = currentDate.minusDays(currentDate.getDayOfWeek().getValue() - 1);
         LocalDate dateIterator = startOfWeek;
 
-        // One row of tall cells
         for (int col = 0; col < 7; col++) {
             VBox cell = createDayCell(dateIterator, false);
-            cell.setPrefHeight(600); // Taller for week view
+            cell.setPrefHeight(600);
             GridPane.setVgrow(cell, javafx.scene.layout.Priority.ALWAYS);
             calendarGrid.add(cell, col, 1);
             dateIterator = dateIterator.plusDays(1);
@@ -719,58 +663,54 @@ public class CalendarController {
     private void drawDayView() {
         calendarGrid.getChildren().clear();
 
-        // 1. Create ScrollPane for vertical scrolling
+
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setPannable(true);
-        // Style class for scroll pane if needed
         scrollPane.getStyleClass().add("timeline-scroll-pane");
 
-        // 2. Create the Timeline Grid
+
         GridPane timelineGrid = new GridPane();
         timelineGrid.getStyleClass().add("timeline-grid");
 
-        scrollPane.setContent(timelineGrid); // Fix: Set content
+        scrollPane.setContent(timelineGrid);
 
-        // Constraints: Col 0 for Time (Fixed), Col 1 for Events (Grow)
+
         javafx.scene.layout.ColumnConstraints colTime = new javafx.scene.layout.ColumnConstraints();
-        colTime.setPercentWidth(10); // ~10% width for time
+        colTime.setPercentWidth(10);
         colTime.setHalignment(javafx.geometry.HPos.RIGHT);
 
         javafx.scene.layout.ColumnConstraints colEvents = new javafx.scene.layout.ColumnConstraints();
-        colEvents.setPercentWidth(90); // ~90% for content
+        colEvents.setPercentWidth(90);
         colEvents.setHgrow(Priority.ALWAYS);
 
         timelineGrid.getColumnConstraints().addAll(colTime, colEvents);
 
-        // 3. Populate Rows (0 to 23 hours)
+
         for (int hour = 0; hour < 24; hour++) {
-            // Row Constraints (Fixed height per hour, e.g., 60px)
             RowConstraints rowConst = new RowConstraints();
             rowConst.setMinHeight(60);
             rowConst.setPrefHeight(60);
             rowConst.setVgrow(Priority.NEVER);
             timelineGrid.getRowConstraints().add(rowConst);
 
-            // Time Label
+
             Label timeLabel = new Label(String.format("%02d:00", hour));
             timeLabel.getStyleClass().add("timeline-time-label");
-            // Add margin to separate from line
+
             GridPane.setMargin(timeLabel, new javafx.geometry.Insets(0, 10, 0, 0));
-            // Align to top-right of cell
+
             GridPane.setValignment(timeLabel, javafx.geometry.VPos.TOP);
             timelineGrid.add(timeLabel, 0, hour);
 
-            // Horizontal Line / Cell Border
-            // We can style the cell itself, or add a container
+
             VBox eventContainer = new VBox();
             eventContainer.getStyleClass().add("timeline-cell");
-            // Add top border via CSS to simulate grid line
+
             timelineGrid.add(eventContainer, 1, hour);
         }
 
-        // 4. Place Events
-        // 1. Collect active group IDs
+
         List<Integer> activeGroupIds = new ArrayList<>();
         for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
             if (node instanceof CheckBox) {
@@ -781,7 +721,7 @@ public class CalendarController {
             }
         }
 
-        // 2. Collect visible label IDs (filtering out those from inactive groups)
+
         List<Integer> visibleLabelIds = new ArrayList<>();
         for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
             if (node instanceof CheckBox) {
@@ -809,7 +749,7 @@ public class CalendarController {
             }
         }
 
-        // 3. Collect visible creator IDs from Shared Groups
+
         List<Integer> visibleCreatorIds = new ArrayList<>();
         for (Integer groupId : activeGroupIds) {
             List<Integer> members = groupToMemberIds.get(groupId);
@@ -832,7 +772,7 @@ public class CalendarController {
                     visibleContext = true;
                 }
             } else {
-                // Shared Event
+
                 if (visibleCreatorIds.contains(event.getId_creador())) {
                     boolean labelVisible = true;
                     if (event.getId_etiqueta() != null) {
@@ -859,20 +799,19 @@ public class CalendarController {
             int startHour = event.getFecha_inicio().getHour();
             int endHour = event.getFecha_fin().getHour();
 
-            // Handle edge case where end time is 00:00 of next day (shows as 0 hour?)
-            // Or if start == end (less than 1 hour duration)
+
             if (endHour <= startHour) {
-                endHour = startHour + 1; // Minimum 1 row span visually
+                endHour = startHour + 1;
             }
-            // Cap at 24 logic if needed, but simple for now
+
 
             int rowSpan = endHour - startHour;
 
-            // Create Event Node
+
             VBox eventNode = new VBox();
             eventNode.getStyleClass().add("timeline-event-entry");
-            // Add color style
-            String styleClass = "event-label-purple"; // Fallback
+
+            String styleClass = "event-label-purple";
             if (event.getId_etiqueta() != null) {
                 for (Etiqueta label : labels) {
                     if (label.getId() == event.getId_etiqueta()) {
@@ -897,28 +836,25 @@ public class CalendarController {
 
             eventNode.getChildren().addAll(titleLabel, timeRangeLabel);
 
-            // Click action
             eventNode.setOnMouseClicked(e -> {
                 e.consume();
                 openEventDetailsDialog(event);
             });
             eventNode.setCursor(Cursor.HAND);
 
-            // Add to Grid
+
             timelineGrid.add(eventNode, 1, startHour);
             GridPane.setRowSpan(eventNode, rowSpan);
-            // Allow it to fill width
+
             GridPane.setHgrow(eventNode, Priority.ALWAYS);
             GridPane.setFillWidth(eventNode, true);
-            // Margin to avoid overlapping lines slightly
+
             GridPane.setMargin(eventNode, new javafx.geometry.Insets(2, 5, 2, 0));
         }
 
-        // Add ScrollPane to main grid
-        // Spanning all rows/cols of the base calendarGrid
         calendarGrid.add(scrollPane, 0, 0);
-        GridPane.setColumnSpan(scrollPane, 7); // Span full width
-        GridPane.setRowSpan(scrollPane, 6); // Span full height
+        GridPane.setColumnSpan(scrollPane, 7);
+        GridPane.setRowSpan(scrollPane, 6);
     }
 
     private VBox createDayCell(LocalDate date, boolean dimNonCurrentMonth) {
@@ -939,15 +875,12 @@ public class CalendarController {
         }
         cell.getChildren().add(dayLabel);
 
-        // Add Holidays
         for (Festivo festivo : holidays) {
             if (festivo.getDia() == date.getDayOfMonth() && festivo.getMes() == date.getMonthValue()) {
                 addHolidayLabel(cell, festivo);
             }
         }
 
-        // Add Events
-        // 1. Collect active group IDs
         List<Integer> activeGroupIds = new ArrayList<>();
         for (javafx.scene.Node node : sharedCalendarsContainer.getChildren()) {
             if (node instanceof CheckBox) {
@@ -958,14 +891,13 @@ public class CalendarController {
             }
         }
 
-        // 2. Collect visible label IDs (filtering out those from inactive groups)
+
         List<Integer> visibleLabelIds = new ArrayList<>();
         for (javafx.scene.Node node : myCalendarsContainer.getChildren()) {
             if (node instanceof CheckBox) {
                 CheckBox cb = (CheckBox) node;
                 if (cb.isSelected() && cb.getUserData() instanceof Integer) {
                     int labelId = (Integer) cb.getUserData();
-                    // Find label object
                     Etiqueta labelObj = null;
                     for (Etiqueta l : labels) {
                         if (l.getId() == labelId) {
@@ -975,7 +907,6 @@ public class CalendarController {
                     }
 
                     if (labelObj != null && labelObj.getId_grupo() != null) {
-                        // Group label: only add if group is active
                         if (activeGroupIds.contains(labelObj.getId_grupo())) {
                             visibleLabelIds.add(labelId);
                         }
@@ -986,7 +917,6 @@ public class CalendarController {
             }
         }
 
-        // 3. Collect visible creator IDs from Shared Groups
         List<Integer> visibleCreatorIds = new ArrayList<>();
         for (Integer groupId : activeGroupIds) {
             List<Integer> members = groupToMemberIds.get(groupId);
@@ -1062,19 +992,14 @@ public class CalendarController {
     }
 
     private void addEventLabel(VBox cell, Evento event) {
-        // Format time "HH:mm"
         String timeStr = event.getFecha_inicio().format(DateTimeFormatter.ofPattern("HH:mm"));
         Label eventLabel = new Label(timeStr + " " + event.getTitulo());
 
-        // Default style
         String styleClass = "event-label-purple";
 
-        // Find label color if exists
         if (event.getId_etiqueta() != null) {
             for (Etiqueta label : labels) {
                 if (label.getId() == event.getId_etiqueta()) {
-                    // Label color could be short code e.g. "red" or legacy "calendar-check-red"
-                    // Map to event-label-COLOR e.g. event-label-red
                     String labelColor = label.getColor();
                     if (labelColor != null && !labelColor.isEmpty()) {
                         String shortColor = labelColor.replace("calendar-check-", "");
@@ -1088,14 +1013,11 @@ public class CalendarController {
         eventLabel.getStyleClass().add(styleClass);
         eventLabel.setWrapText(true);
 
-        // Add click listener
         eventLabel.setOnMouseClicked(e -> {
-            e.consume(); // Prevent bubbling if needed
+            e.consume();
             openEventDetailsDialog(event);
         });
 
-        // Change cursor to indicate clickability (already in CSS for icon-btn,
-        // beneficial here too)
         eventLabel.setStyle("-fx-cursor: hand;");
 
         cell.getChildren().add(eventLabel);
@@ -1109,25 +1031,21 @@ public class CalendarController {
     }
 
     private void drawMiniCalendar() {
-        // Update Header Label
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.forLanguageTag("es-ES"));
         String formattedDate = currentDate.format(formatter);
         formattedDate = formattedDate.substring(0, 1).toUpperCase() + formattedDate.substring(1);
         miniMonthLabel.setText(formattedDate);
 
-        // Clear grid but keep headers
         miniCalendarGrid.getChildren().removeIf(node -> {
             Integer rowIndex = GridPane.getRowIndex(node);
             return rowIndex != null && rowIndex > 0;
         });
 
-        // Calculate days (same as main calendar)
         LocalDate firstOfMonth = YearMonth.from(currentDate).atDay(1);
         int dayOfWeekValue = firstOfMonth.getDayOfWeek().getValue();
         int offset = dayOfWeekValue - 1;
         LocalDate dateIterator = firstOfMonth.minusDays(offset);
 
-        // Draw rows
         for (int row = 1; row <= 6; row++) {
             for (int col = 0; col < 7; col++) {
                 Label dayLabel = new Label(String.valueOf(dateIterator.getDayOfMonth()));
@@ -1135,7 +1053,7 @@ public class CalendarController {
 
                 if (isCurrentMonth) {
                     dayLabel.setStyle("-fx-text-fill: white; -fx-padding: 3;");
-                    // Highlight today or random specific day logic could go here
+
                 } else {
                     dayLabel.setStyle("-fx-text-fill: grey; -fx-padding: 3;");
                 }
@@ -1214,7 +1132,6 @@ public class CalendarController {
                         boolean success = usuarioDAO.updatePassword(userId, newPassword);
 
                         if (success) {
-                            // Send Email Notification
                             String email = Session.getInstance().getUsuario().getCorreo();
                             String name = "Usuario";
                             if (Session.getInstance().getCliente() != null) {
@@ -1230,7 +1147,6 @@ public class CalendarController {
                             alert.setHeaderText(null);
                             alert.setContentText("Contraseña actualizada correctamente.");
 
-                            // Update saved credentials if auto-login is used
                             if (org.example.calendario_app.util.PrefsManager.getEmail() != null) {
                                 org.example.calendario_app.util.PrefsManager.saveCreds(
                                         Session.getInstance().getUsuario().getCorreo(), newPassword);

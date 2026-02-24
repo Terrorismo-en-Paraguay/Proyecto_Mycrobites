@@ -18,17 +18,6 @@ public class EventoDAOImpl implements EventoDAO {
     @Override
     public List<Evento> findAllByUsuarioId(int idUsuario) {
         List<Evento> eventos = new ArrayList<>();
-        // Query to get:
-        // 1. Events created by the user
-        // 2. Events that have a label which is shared with the user (via
-        // etiquetas_usuarios)
-        // 3. Events that have a label which is shared with a group the user is in (via
-        // etiquetas_grupos -> grupos_usuarios)
-
-        // Query to get:
-        // 1. Events created by the user
-        // 2. Events that have a label which is shared with the user (via
-        // etiquetas_usuarios)
 
         String query = """
                     SELECT DISTINCT ev.*
@@ -100,8 +89,6 @@ public class EventoDAOImpl implements EventoDAO {
                         idGenerado = generatedKeys.getInt(1);
                         evento.setId(idGenerado);
 
-                        // Auto-sharing logic (New)
-                        // Add creator to event_users with 'pendiente' status
                         addEventUserRelation(conn, idGenerado, evento.getId_creador(), "pendiente");
 
                         if (evento.getId_etiqueta() != null) {
@@ -117,7 +104,6 @@ public class EventoDAOImpl implements EventoDAO {
     }
 
     private void shareWithGroupMembers(Connection conn, int eventId, int labelId, int creatorId) throws SQLException {
-        // 1. Check if label is linked to a group
         String checkGroupQuery = "SELECT id_grupo FROM etiquetas WHERE id_etiqueta = ?";
         Integer groupId = null;
         try (PreparedStatement pstmt = conn.prepareStatement(checkGroupQuery)) {
@@ -129,7 +115,6 @@ public class EventoDAOImpl implements EventoDAO {
             }
         }
 
-        // 2. If group exists, invite all members (except creator)
         if (groupId != null) {
             String membersQuery = "SELECT id_usuario FROM grupos_usuarios WHERE id_grupo = ? AND id_usuario != ?";
             String inviteQuery = "INSERT INTO eventos_usuarios (id_evento, id_usuario, estado, notificado) VALUES (?, ?, 'pendiente', 0) ON DUPLICATE KEY UPDATE id_usuario=id_usuario";

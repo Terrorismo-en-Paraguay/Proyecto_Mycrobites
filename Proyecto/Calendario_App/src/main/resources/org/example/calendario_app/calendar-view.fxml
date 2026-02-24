@@ -18,7 +18,6 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane styleClass="root" stylesheets="@calendar.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.calendario_app.CalendarController">
-    <!-- Left Sidebar -->
     <left>
         <VBox prefWidth="250.0" spacing="20.0" styleClass="sidebar">
             <padding>
@@ -37,10 +36,8 @@
                         </font>
                     </Label>
                 </HBox>
-                
-                <!-- Mini Calendar -->
+
                 <GridPane fx:id="miniCalendarGrid" hgap="5.0" vgap="5.0">
-                   <!-- Days of Week -->
                    <Label text="LU" textFill="GREY" GridPane.columnIndex="0" />
                    <Label text="MA" textFill="GREY" GridPane.columnIndex="1" />
                    <Label text="MI" textFill="GREY" GridPane.columnIndex="2" />
@@ -48,8 +45,7 @@
                    <Label text="VI" textFill="GREY" GridPane.columnIndex="4" />
                    <Label text="SA" textFill="GREY" GridPane.columnIndex="5" />
                    <Label text="DO" textFill="GREY" GridPane.columnIndex="6" />
-                   
-                   <!-- Cells populate dynamically -->
+
                 </GridPane>
                    
 
@@ -81,7 +77,6 @@
         </VBox>
     </left>
 
-    <!-- Main Content -->
     <center>
         <BorderPane styleClass="main-content">
             <top>
@@ -148,15 +143,14 @@
                         <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints minHeight="40.0" prefHeight="40.0" /> <!-- Headers -->
+                        <RowConstraints minHeight="40.0" prefHeight="40.0" />
                         <RowConstraints vgrow="ALWAYS" />
                         <RowConstraints vgrow="ALWAYS" />
                         <RowConstraints vgrow="ALWAYS" />
                         <RowConstraints vgrow="ALWAYS" />
                         <RowConstraints vgrow="ALWAYS" />
                     </rowConstraints>
-                    
-                    <!-- Weekday Headers -->
+
                     <Label text="Lunes" styleClass="day-header" GridPane.columnIndex="0" GridPane.halignment="CENTER"/>
                     <Label text="Martes" styleClass="day-header" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
                     <Label text="Miércoles" styleClass="day-header" GridPane.columnIndex="2" GridPane.halignment="CENTER"/>
@@ -164,9 +158,6 @@
                     <Label text="Viernes" styleClass="day-header" GridPane.columnIndex="4" GridPane.halignment="CENTER"/>
                     <Label text="Sábado" styleClass="day-header" GridPane.columnIndex="5" GridPane.halignment="CENTER"/>
                     <Label text="Domingo" styleClass="day-header" GridPane.columnIndex="6" GridPane.halignment="CENTER"/>
-                    
-                    <!-- Grid Lines / Cells will be populated by controller or hardcoded for now -->
-                    <!-- Grid Cells will be populated dynamically -->
                 </GridPane>
             </center>
         </BorderPane>

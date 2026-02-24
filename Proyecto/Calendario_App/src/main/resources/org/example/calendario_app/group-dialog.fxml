@@ -17,7 +17,6 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <!-- Header -->
     <VBox spacing="5.0">
         <Label text="Crear Nuevo Grupo" textFill="WHITE">
             <font>
@@ -26,20 +25,16 @@
         </Label>
         <Label text="Configura tu nuevo grupo de trabajo y añade miembros para empezar a colaborar." textFill="#B0B0B0" />
     </VBox>
-
-    <!-- Group Name -->
     <VBox spacing="5.0">
         <Label styleClass="input-label" text="Nombre del Grupo" />
         <TextField fx:id="nameField" promptText="Ej. Equipo de Diseño UX" styleClass="dialog-input" />
     </VBox>
 
-    <!-- Description -->
     <VBox spacing="5.0">
         <Label styleClass="input-label" text="Descripción del Grupo" />
         <TextArea fx:id="descriptionArea" prefHeight="80.0" promptText="Describe el propósito de este grupo..." styleClass="dialog-input, text-area" wrapText="true" />
     </VBox>
 
-    <!-- Labels -->
     <VBox spacing="10.0">
         <Label styleClass="input-label" text="Etiquetas" />
         <HBox spacing="10.0" alignment="CENTER_LEFT">
@@ -49,7 +44,6 @@
         <FlowPane fx:id="selectedLabelsContainer" hgap="10.0" vgap="10.0" />
     </VBox>
 
-    <!-- Add People -->
     <VBox spacing="10.0">
         <Label styleClass="input-label" text="Añadir Personas" />
         <HBox spacing="10.0" alignment="CENTER_LEFT">
@@ -57,8 +51,7 @@
             <ComboBox fx:id="roleComboBox" promptText="Rol" prefWidth="120.0" styleClass="combo-box"/>
             <Button text="+ Añadir" onAction="#handleAddMember" style="-fx-background-color: #A066F5; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
         </HBox>
-        
-        <!-- Members List -->
+
         <VBox style="-fx-background-color: #1E2126; -fx-background-radius: 5; -fx-padding: 10;">
              <Label text="MIEMBROS" style="-fx-text-fill: #7F8C8D; -fx-font-size: 10px; -fx-font-weight: bold;"/>
              <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" prefHeight="100.0">
@@ -69,7 +62,6 @@
         </VBox>
     </VBox>
 
-    <!-- Footer -->
     <HBox alignment="CENTER_RIGHT" spacing="10.0">
         <Button onAction="#handleCancel" text="Cancelar" styleClass="btn-transparent-border" />
         <Button onAction="#handleCreateGroup" text="Crear Grupo" style="-fx-background-color: #A066F5; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;" />

@@ -105,7 +105,6 @@ public class LabelDialogController {
         if (errorMessage.length() == 0) {
             return true;
         } else {
-            // Show alert or simple print
             System.out.println(errorMessage);
             return false;
         }

@@ -25,7 +25,6 @@ public class UsuarioDAO {
     }
 
     public int registrar(Usuario usuario) {
-        // Hash the password before saving
         String hashedPassword = org.example.calendario_app.util.PasswordUtil.hash(usuario.getPassword_hash());
         usuario.setPassword_hash(hashedPassword);
         return usuarioDAO.registrar(usuario);

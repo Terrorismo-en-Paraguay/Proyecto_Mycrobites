@@ -43,12 +43,12 @@ public class GroupDialogController {
     private List<Etiqueta> availableLabels;
     private final List<Etiqueta> selectedLabels = new ArrayList<>();
 
-    // Dependencies needed for creating a new label
+
     private EtiquetaDAO etiquetaDAO;
     private GrupoDAO grupoDAO;
     private org.example.calendario_app.dao.UsuarioDAO usuarioDAO;
 
-    // Simple inner class or structure for Member
+
     public static class GroupMember {
         public org.example.calendario_app.model.Usuario usuario;
         public String role;
@@ -136,7 +136,6 @@ public class GroupDialogController {
         this.usuarioDAO = usuarioDAO;
     }
 
-    // Additional getters if needed for description, members, labels etc.
 
     @FXML
     private void handleAddMember() {
@@ -151,7 +150,6 @@ public class GroupDialogController {
             org.example.calendario_app.model.Usuario selectedUser = usuarioDAO.findByEmail(emailInput.trim());
 
             if (selectedUser == null) {
-                // User not found
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Usuario no encontrado");
                 alert.setContentText("No existe un usuario con el correo: " + emailInput);
@@ -160,8 +158,6 @@ public class GroupDialogController {
             }
 
             String email = selectedUser.getCorreo();
-
-            // Check if already added
             boolean alreadyAdded = members.stream().anyMatch(m -> m.usuario.getCorreo().equals(email));
             if (alreadyAdded) {
                 return;

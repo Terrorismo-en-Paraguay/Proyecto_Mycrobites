@@ -28,8 +28,6 @@ public class Evento {
         this.id_etiqueta = id_etiqueta;
     }
 
-    // Constructor for simple creation (app uses LocalDate only for now, defaulting
-    // times)
     public Evento(String titulo, LocalDate date, String descripcion, int id_creador) {
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -38,7 +36,6 @@ public class Evento {
         this.id_creador = id_creador;
     }
 
-    // Constructor for creating new events with all fields
     public Evento(String titulo, String descripcion, LocalDateTime fecha_inicio, LocalDateTime fecha_fin,
             String ubicacion, int id_creador, Integer id_etiqueta) {
         this.titulo = titulo;
@@ -50,7 +47,6 @@ public class Evento {
         this.id_etiqueta = id_etiqueta;
     }
 
-    // Getters and Setters
     public int getId() {
         return id_evento;
     }
@@ -115,7 +111,6 @@ public class Evento {
         this.id_etiqueta = id_etiqueta;
     }
 
-    // Helper for legacy code that expects LocalDate
     public LocalDate getFecha() {
         return fecha_inicio != null ? fecha_inicio.toLocalDate() : null;
     }

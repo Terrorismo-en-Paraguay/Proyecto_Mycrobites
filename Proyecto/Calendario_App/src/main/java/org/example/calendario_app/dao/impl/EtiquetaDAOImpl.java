@@ -18,7 +18,6 @@ public class EtiquetaDAOImpl implements EtiquetaDAO {
     @Override
     public List<Etiqueta> findAllByUsuarioId(int idUsuario) {
         List<Etiqueta> etiquetas = new ArrayList<>();
-        // Fetch only personal labels (linked to user)
         String query = """
                 SELECT e.* FROM etiquetas e
                 JOIN etiquetas_usuarios eu ON e.id_etiqueta = eu.id_etiqueta
@@ -54,7 +53,7 @@ public class EtiquetaDAOImpl implements EtiquetaDAO {
 
         try {
             conn = databaseConnection.getConn();
-            conn.setAutoCommit(false); // Start transaction
+            conn.setAutoCommit(false);
 
             // 1. Insert Etiqueta
             try (PreparedStatement pstmt1 = conn.prepareStatement(insertEtiqueta, Statement.RETURN_GENERATED_KEYS)) {
@@ -76,7 +75,6 @@ public class EtiquetaDAOImpl implements EtiquetaDAO {
                 }
             }
 
-            // 2. Link to User
             if (idGenerado != -1) {
                 try (PreparedStatement pstmt2 = conn.prepareStatement(linkUser)) {
                     pstmt2.setInt(1, idGenerado);
@@ -85,7 +83,7 @@ public class EtiquetaDAOImpl implements EtiquetaDAO {
                 }
             }
 
-            conn.commit(); // Commit transaction
+            conn.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();

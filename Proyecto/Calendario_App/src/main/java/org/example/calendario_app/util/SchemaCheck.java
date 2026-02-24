@@ -18,7 +18,6 @@ public class SchemaCheck {
         DatabaseConnection db = new DatabaseConnection();
         try (Connection conn = db.getConn()) {
             if (conn != null) {
-                // Try to get column details for 'grupos_usuarios'
                 String query = "SHOW COLUMNS FROM grupos_usuarios LIKE 'rol'";
                 try (PreparedStatement dbo = conn.prepareStatement(query);
                         ResultSet rs = dbo.executeQuery()) {

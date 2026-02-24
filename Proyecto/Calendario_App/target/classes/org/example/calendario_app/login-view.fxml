@@ -14,7 +14,6 @@
 
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@login.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.calendario_app.AppController">
    <children>
-      <!-- Left Side -->
       <VBox alignment="CENTER_LEFT" prefHeight="600.0" prefWidth="450.0" styleClass="left-pane" HBox.hgrow="ALWAYS">
          <padding>
             <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
@@ -31,22 +30,19 @@
                   <Insets top="40.0" />
                </VBox.margin>
                <children>
-                  <!-- Placeholder for Image -->
                   <ImageView fitHeight="200.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </StackPane>
          </children>
       </VBox>
-      
-      <!-- Right Side -->
+
       <VBox alignment="CENTER_LEFT" prefHeight="600.0" prefWidth="450.0" styleClass="right-pane" HBox.hgrow="ALWAYS">
          <padding>
             <Insets bottom="40.0" left="60.0" right="60.0" top="40.0" />
          </padding>
          <children>
             <Label fx:id="lblHeader" styleClass="header-label" text="Accede a tu cuenta" />
-            
-            <!-- Toggle Buttons -->
+
             <HBox alignment="CENTER" styleClass="toggle-container">
                <VBox.margin>
                   <Insets top="20.0" />
@@ -56,8 +52,7 @@
                   <Button fx:id="btnToggleRegister" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onToggleRegister" styleClass="toggle-button" text="Registro" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
-            
-            <!-- Register Fields (Name & Surname) -->
+
             <VBox fx:id="registerFieldsContainer" managed="false" visible="false">
                <VBox.margin>
                   <Insets top="20.0" />
@@ -83,7 +78,6 @@
                </children>
             </VBox>
 
-            <!-- Email Field -->
             <Label styleClass="field-label" text="Correo Electrónico">
                <VBox.margin>
                   <Insets top="20.0" />
@@ -95,7 +89,7 @@
                </VBox.margin>
             </TextField>
             
-            <!-- Password Field -->
+
             <Label styleClass="field-label" text="Contraseña">
                <VBox.margin>
                   <Insets top="15.0" />
@@ -125,14 +119,14 @@
                </VBox.margin>
             </HBox>
             
-            <!-- Login Button -->
+
             <Button fx:id="btnLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="primary-button" text="Iniciar Sesión" onAction="#onLoginButtonClick">
                <VBox.margin>
                   <Insets top="20.0" />
                </VBox.margin>
             </Button>
             
-            <!-- Separator -->
+
             <HBox alignment="CENTER" spacing="10.0">
                <VBox.margin>
                   <Insets top="20.0" />
@@ -144,7 +138,7 @@
                </children>
             </HBox>
             
-            <!-- Google Button -->
+
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="secondary-button" text="G  Continuar con Google">
                <VBox.margin>
                   <Insets top="20.0" />

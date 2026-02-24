@@ -52,7 +52,7 @@ public class EventDialogController {
 
     @FXML
     private void initialize() {
-        // Populate Time Combos
+
         List<Integer> hours = IntStream.range(0, 24).boxed().toList();
         List<Integer> minutes = IntStream.range(0, 60).filter(i -> i % 5 == 0).boxed().toList();
 
@@ -61,20 +61,20 @@ public class EventDialogController {
         endHourCombo.setItems(FXCollections.observableArrayList(hours));
         endMinuteCombo.setItems(FXCollections.observableArrayList(minutes));
 
-        // Defaults
+
         startHourCombo.getSelectionModel().select(Integer.valueOf(9));
         startMinuteCombo.getSelectionModel().select(Integer.valueOf(0));
         endHourCombo.getSelectionModel().select(Integer.valueOf(10));
         endMinuteCombo.getSelectionModel().select(Integer.valueOf(0));
 
-        // Validation: verify title and date are not empty
+
         saveButton.disableProperty().bind(
                 titleField.textProperty().isEmpty().or(datePicker.valueProperty().isNull()));
 
         saveButton.setOnAction(e -> handleSave());
         cancelButton.setOnAction(e -> handleCancel());
 
-        // Configure ComboBox to show label names (existing code)
+
         labelComboBox.setConverter(new StringConverter<Etiqueta>() {
             @Override
             public String toString(Etiqueta object) {
@@ -121,14 +121,14 @@ public class EventDialogController {
             LocalDateTime startDateTime = datePicker.getValue().atTime(startH, startM);
             LocalDateTime endDateTime = datePicker.getValue().atTime(endH, endM);
 
-            // Note: client ID will be set by the main controller
+
             event = new Evento(
                     titleField.getText(),
                     descriptionArea.getText(),
                     startDateTime,
                     endDateTime,
-                    "", // Location default empty
-                    0, // Creator temporarily 0
+                    "",
+                    0,
                     labelId);
             saveClicked = true;
             dialogStage.close();
@@ -140,7 +140,7 @@ public class EventDialogController {
     }
 
     private boolean isValid() {
-        // Basic validation already handled by binding, logic can be extended here
+
         return true;
     }
 }

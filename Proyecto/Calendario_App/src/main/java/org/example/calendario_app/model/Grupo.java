@@ -4,7 +4,6 @@ public class Grupo {
     private int id_grupo;
     private String nombre;
     private String descripcion;
-    // timestamp fields skipped for basic model unless needed
 
     public Grupo(String nombre, String descripcion) {
         this.nombre = nombre;
